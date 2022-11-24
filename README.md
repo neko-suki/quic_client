@@ -1,5 +1,9 @@
 Experimental implementation of QUIC client.
 
+# Environment
+
+Ubuntu 20.04
+
 # requirement
 
 - CMake >= v3.2
