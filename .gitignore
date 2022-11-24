@@ -1,3 +1,2 @@
-a.out
-.DS_Store
 build/*
+quic/keylog.txt
