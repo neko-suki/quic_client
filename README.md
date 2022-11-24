@@ -23,7 +23,7 @@ $ make
 Echo client is available.
 
 ### server
-Use s2n-quic v1.12.0. 
+Use [s2n-quic](https://github.com/aws/s2n-quic/tree/main) [v1.12.0](https://github.com/aws/s2n-quic/releases/tag/v1.12.0). 
 
 ```
 $ git clone https://github.com/aws/s2n-quic
