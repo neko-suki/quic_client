@@ -23,6 +23,6 @@ void Socket::Send(std::vector<uint8_t> & packet){
     sendto(sock_, (const unsigned char *)packet.data(), packet_sz,
         MSG_CONFIRM, (const struct sockaddr *) &servaddr,
             sizeof(servaddr));
-    printf("Packet is sent.\n");
+    //printf("Packet is sent.\n");
 }
 }

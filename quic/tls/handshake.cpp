@@ -35,7 +35,7 @@ void Handshake::Parse(std::vector<uint8_t> & buf, int &p) {
     } else if (msg_type_ == 20) {
       finished_.Parse(buf, p);
     } else {
-      std::cout << "not implemented" << std::endl;
+      printf("not implemented\n");
       p += length_;
       std::exit(1);
     }

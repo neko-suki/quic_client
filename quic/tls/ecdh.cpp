@@ -13,16 +13,16 @@ bool ECDH::CreateKey(void) {
       return false;
     }
 
-    printf("key is valid? (valid is 1, invalid is 0): %d\n",
-           EC_KEY_check_key(key));
+    //printf("key is valid? (valid is 1, invalid is 0): %d\n",
+    //       EC_KEY_check_key(key));
 
-    EC_KEY_print_fp(stdout, key, 0);
+    //EC_KEY_print_fp(stdout, key, 0);
 
     return true;
 }
 
 std::vector<uint8_t> ECDH::GetPublicKey() {
-    EC_KEY_print_fp(stdout, key, 0);
+    //EC_KEY_print_fp(stdout, key, 0);
     int size = i2o_ECPublicKey(key, nullptr);
     unsigned char *buf = new unsigned char[size];
     std::vector<uint8_t> ret(size);
@@ -39,9 +39,8 @@ void ECDH::SetPeerPublicKey(std::vector<uint8_t> &public_key_vec) {
 
     if (EC_POINT_oct2point(ec_group, peer, public_key_vec.data(),
                            public_key_vec.size(), bn_ctx)) {
-      fprintf(stdout, "true\n");
     } else {
-      fprintf(stdout, "false\n");
+      fprintf(stdout, "EC_POINT_oct2point failed\n");
       std::exit(1);
     }
 }

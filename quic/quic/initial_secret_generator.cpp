@@ -26,11 +26,11 @@ void InitialSecretGenerator::GenerateKey(const std::vector<uint8_t> & dcid){
 }
 
 void InitialSecretGenerator::print_vec(std::string name, const std::vector<uint8_t> v){
-    printf("%s: ", name.c_str());
-    for(const auto & ch : v){
-        printf("%02x", ch);
-    }
-    printf("\n");
+    //printf("%s: ", name.c_str());
+    //for(const auto & ch : v){
+    //    printf("%02x", ch);
+    //}
+    //printf("\n");
 }
 
 void InitialSecretGenerator::print(){

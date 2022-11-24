@@ -154,7 +154,6 @@ int PacketProtection::ProtectHeader(uint8_t header[], int header_sz,
             header[i] ^= out[mask];
         }
     } else {
-        printf("Short Header protectoin\n");
         header[0] ^= out[0] & 0x1f;
         for(int i = packet_number_offset, mask=1; mask <= packet_number_length;i++, mask++){
             header[i] ^= out[mask];

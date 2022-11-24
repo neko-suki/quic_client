@@ -114,7 +114,7 @@ void Handshake::CreateHeader(std::vector<uint8_t> & scid, std::vector<uint8_t> &
     std::vector<uint8_t> length_binary = length.GetBinary();
     std::copy(length_binary.begin(), length_binary.end(), std::back_inserter(header_));
     packet_number_offset_ += length_binary.size();
-    printf("length of handshake: %ld\n", 1 + payload_.size() + 16);
+    //printf("length of handshake: %ld\n", 1 + payload_.size() + 16);
 
     // packet number length
     uint8_t pn[1] = {

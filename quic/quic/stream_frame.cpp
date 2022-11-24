@@ -27,11 +27,8 @@ void StreamFrame::Parse(std::vector<uint8_t> & buf, int & p){
         length_ = parse_variable_length_integer(buf, p);
     }
     std::copy(buf.begin()+p, buf.begin() + length_, std::back_inserter(stream_data_));
-    printf("stream_id: %lu\n", stream_id_);
     std::string buf_string(buf.data() + p, buf.data() + p + length_);
-    printf("=================================================================\n");
-    printf("stream frame received. payload: %s\n", buf_string.c_str());
-    printf("=================================================================\n");
+    printf("stream frame received. id: %lu, payload: %s\n", stream_id_, buf_string.c_str());
     p += length_;
 
 }

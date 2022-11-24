@@ -34,7 +34,6 @@ std::vector<uint8_t> HMAC::ComputeHMAC(std::vector<uint8_t> &in,
       fprintf(stderr, "HMAC_Final failed.\n");
     }
 
-    printf("hmac.size() = %ld, len = %d\n", hmac.size(), len);
     hmac.resize(len);
     return hmac;
 }

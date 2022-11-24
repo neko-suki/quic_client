@@ -127,6 +127,5 @@ void InitialPacket::CreateHeader(std::vector<uint8_t> & scid, std::vector<uint8_
     for(int i = 0;i < 1;i++){
         header_.push_back(pn[i]);
     }
-    std::cout << "header size: " << header_.size() << std::endl;
 }
 } //  namespace

@@ -91,7 +91,7 @@ struct PacketInfo ParsePacket::UnprotectHeader(unsigned char packet[], int packe
             std::copy(packet+p, packet+p+source_connection_id_length, std::back_inserter(ret.source_connection_id));
             p += source_connection_id_length;
         } else {
-            std::cout <<"not implemented:" << std::endl;
+            printf("not implemented:\n");
             std::exit(1);
         }
 
@@ -152,7 +152,7 @@ struct PacketInfo ParsePacket::UnprotectHeader(unsigned char packet[], int packe
 
     if (header_type == LONG_HEADER){
         packet[0] ^= (mask[0] & 0x0f);
-        printf("packet[0]: %02x\n", packet[0]);
+        //printf("packet[0]: %02x\n", packet[0]);
     } else { // Short Header
         packet[0] ^= (mask[0] & 0x1f);
     }

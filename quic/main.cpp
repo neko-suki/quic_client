@@ -59,7 +59,6 @@ ssize_t recvfrom(quic::Socket & sock, uint8_t *buf, const size_t buf_size){
     socklen_t addlen = sizeof(servaddr);
     ssize_t read_len = recvfrom(sock.sock_, reinterpret_cast<void*>(buf), buf_size, 0,
             (struct sockaddr *) &servaddr, &addlen);
-    printf("read size: %ld\n", read_len);
     return read_len;
 }
 
@@ -108,7 +107,7 @@ int main(){
     */
 
 
-   printf("send initial packet ===============================================\n");
+   printf("========== Send initial packet ==========\n");
     // SCID of client
     std::vector<uint8_t> id_of_client = {
         0x83, 0x94, 0xc8, 0xf0, 0x3e,0x51, 0x57,0x09
@@ -121,7 +120,7 @@ int main(){
 
     quic::InitialSecretGenerator initial_secret_generator;
     initial_secret_generator.GenerateKey(id_of_server);
-    initial_secret_generator.print();
+    //initial_secret_generator.print();
 
     // make initial packet
     quic::InitialPacket initial_packet;
@@ -132,7 +131,7 @@ int main(){
     quic::Socket sock;
     sock.Send(initial_packet_binary);
 
-    printf("recv initial packet ===============================================\n");
+    printf("========== Initial packet received ==========\n");
     uint8_t packet[2048];
     const size_t packet_size = 2048;
     ssize_t read_size = recvfrom(sock, packet, packet_size);
@@ -166,7 +165,6 @@ int main(){
     std::unique_ptr<quic::QUICFrame> initial_frame;
     while(!initial_frame_received || !ack_received){
         std::unique_ptr<quic::QUICFrame> frame = frame_parser.Parse(decoded_payload, buf_pointer);
-        std::cout << "frame type: " << (int)(frame->frame_type_) << std::endl;
         switch(frame->frame_type_){
             case quic::QUICFrameType::ACK:
                 ack_received = true;
@@ -176,7 +174,7 @@ int main(){
                 initial_frame = std::move(frame);
                 break;
             default:
-                std::cout <<"invalid frame type" << std::endl;
+                printf("invalid frame type\n");
                 std::exit(1);
                 break;
         }
@@ -207,8 +205,7 @@ int main(){
         hash_length, hello_hash, secret
     );
 
-
-    printf("parse handshake packet ================================================================\n");
+    printf("========== Handshake packet received ==========\n");
     std::vector<uint8_t> server_handshake_hp = key_schedule.GetServerHandshakeHP();
     std::vector<uint8_t> server_handshake_key = key_schedule.GetServerHandshakeKey();
     std::vector<uint8_t> server_handshake_iv = key_schedule.GetServerHandshakeIV();
@@ -262,10 +259,8 @@ int main(){
     initial_packet.Protect(initial_secret_generator);
 
     std::vector<uint8_t> initial_ack_binary = initial_packet.GetBinary();
+    printf("========== Send initial ack ==========\n");
     sock.Send(initial_ack_binary);
-
-    printf("send initial ack ===============================================\n");
-
 
     // send Handshake packet
     std::vector<uint8_t> finished_key = key_schedule.GetFinishedKey();
@@ -295,14 +290,11 @@ int main(){
     handshake.Protect(client_handshake_key, client_handshake_iv, client_handshake_hp);
 
     std::vector<uint8_t> handshake_binary = handshake.GetBinary();
+    printf("========== Send handshake finished and ack ==========\n");
     sock.Send(handshake_binary);
-    printf("send handshake finished and ack ===============================================\n");
 
-    printf("===========================================================================\n");
-    printf("================= short header ===========================================\n");
-    printf("===========================================================================\n");
+    printf("========== Application Packet ==========\n");
     
-
     key_schedule.ComputeApplicationKey(hash_length, finished_hash);
     key_schedule.DumpKeylog();
 
@@ -325,11 +317,10 @@ int main(){
 
     std::thread recv_thread([&]{
         while(true){
-            printf("recv thread =======================================\n");
             read_size = recvfrom(sock, packet, packet_size);
             quic::PacketType packet_type = quic::IsLongHeaderPacket(packet);
             if (quic::PacketType::Handshake == packet_type){
-                printf("================= Handshake Packet ACK ===========================================\n");
+                printf("========== Handshake Packet received ==========\n");
                 packet_info = p.Unprotect(
                     packet, read_size,
                     server_handshake_hp,
@@ -342,10 +333,10 @@ int main(){
 
                 buf_pointer = 0;
                 frame_parser.Parse(decoded_payload, buf_pointer);
-                printf("================= Parse Handshake Packet ACK end ===================================\n");
+                printf("========== Parse Handshake Packet ACK end ==========\n");
             } else {
+                printf("========== 1-RTT packet received ==========\n");
                 packet_info = p.UnprotectHeader(packet, read_size, server_app_hp, EVP_aes_128_ecb(), header, id_of_client);
-                printf("packet number: %ld\n", packet_info.packet_number);
                 decoded_payload.resize(packet_info.payload_length);
                 p.UnprotectPayload(
                     header,
@@ -354,11 +345,7 @@ int main(){
                     server_app_iv, server_app_key,
                     packet_info.packet_number
                 );
-                printf("decoded payload\n");
-                for(int i = 0;i < decoded_payload.size();i++){
-                    printf("%02x", decoded_payload[i]);
-                }
-                printf("\n");
+
                 std::vector<std::unique_ptr<quic::QUICFrame>> frames = frame_parser.ParseAll(decoded_payload);
                 for(int i = 0;i < frames.size();i++){
                     if (frames[i] && frames[i]->FrameType() == quic::QUICFrameType::HANDSHAKE_DONE){
@@ -380,22 +367,17 @@ int main(){
     {
         std::unique_lock<std::mutex> lk(mtx);
         cond.wait(lk, [&handshake_done]{return handshake_done;});
-        printf("WakeUp\n");
+        printf("========== Handshake Done ==========\n");
 
         quic::StreamManager stream_manager;
         std::string input;
         while(getline(std::cin, input)){
             if (input.size() == 0)continue;
-            std::cout <<"echo input: " << input << std::endl;
+            printf("echo input: %s\n", input.c_str());
             quic::Stream stream = stream_manager.CreateClientInitiatedBidirectionalStream();
             stream.AddPayload(input);
             stream.SetFin();
             std::vector<uint8_t> stream_frame = stream.GetPayload();
-            printf("dump stream_frame\n");
-            for(int i = 0;i < stream_frame.size();i++){
-                printf("%02x", stream_frame[i]);
-            }
-            printf("\n");
 
             quic::OneRttPacket one_rtt_packet(id_of_server, client_app_hp, client_app_key, client_app_iv, packet_number_manager.GetPacketNumber());
             one_rtt_packet.AddFrame(stream_frame);

@@ -19,17 +19,17 @@ std::unique_ptr<QUICFrame> FrameParser::Parse(std::vector<uint8_t> & buf, int & 
                     cnt++;
                     p++;
                 }
-                printf("Padding Frame received. cnt: %u\n", p);
+                printf("PADDING Frame received. cnt: %u\n", p);
                 break;
             }
         case 0x01:
-            printf("Ping Frame received\n");
+            printf("PING Frame received\n");
             p++;
             break;
         case 0x02:
             {
                 ret = std::make_unique<ACKFrame>();
-                printf("ACK Frame: type 0x02\n");
+                printf("ACK frame received\n");
                 p++;
                 ret->Parse(buf, p);
                 break;
@@ -37,7 +37,7 @@ std::unique_ptr<QUICFrame> FrameParser::Parse(std::vector<uint8_t> & buf, int & 
         case 0x06:
             {
                 ret = std::make_unique<CryptoFrame>();
-                printf("CRYPTO Frame: type 0x06\n");
+                printf("CRYPTO frame received\n");
                 p++;
                 ret->Parse(buf, p);
                 break;
@@ -52,14 +52,14 @@ std::unique_ptr<QUICFrame> FrameParser::Parse(std::vector<uint8_t> & buf, int & 
         case 0x0f:
             {
                 ret = std::make_unique<StreamFrame>();
-                printf("Stream Frame Received\n");
+                printf("STREAM frame received\n");
                 ret->Parse(buf, p);
 
                 break;
             }
         case 0x18:
             {
-                printf("NewConnectionId received\n");
+                printf("NEW_CONNECTION_ID frame received\n");
                 p++; // type;
                 uint64_t sequence_number = parse_variable_length_integer(buf.data(), p);
                 uint64_t retire_prior_to = parse_variable_length_integer(buf.data(), p);
@@ -71,7 +71,7 @@ std::unique_ptr<QUICFrame> FrameParser::Parse(std::vector<uint8_t> & buf, int & 
             break;
         case 0x19:
             {
-                printf("RetireConnectionId received\n"); 
+                printf("RETIRE_CONNECTION_ID frame feceived\n"); 
                 p++; // type
                 uint64_t sequence_number = parse_variable_length_integer(buf.data(), p);
                 break;
@@ -79,7 +79,7 @@ std::unique_ptr<QUICFrame> FrameParser::Parse(std::vector<uint8_t> & buf, int & 
         case 0x1e:
             {
                 ret = std::make_unique<HandshakeDoneFrame>();
-                printf("HANDSHAKE_DONE Frame: type 0x1e\n");
+                printf("HANDSHAKE_DONE frame received\n");
                 ret->Parse(buf, p);
                 break;
 
@@ -93,7 +93,6 @@ std::unique_ptr<QUICFrame> FrameParser::Parse(std::vector<uint8_t> & buf, int & 
 }
 
 std::vector<std::unique_ptr<QUICFrame>> FrameParser::ParseAll(std::vector<uint8_t> & buf){
-    printf("Parse All\n");
     int p = 0;
     std::vector<std::unique_ptr<QUICFrame>> ret;
     while(p < buf.size()){
