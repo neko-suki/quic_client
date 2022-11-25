@@ -336,16 +336,9 @@ int main(){
                 printf("========== Parse Handshake Packet ACK end ==========\n");
             } else {
                 printf("========== 1-RTT packet received ==========\n");
-                packet_info = p.UnprotectHeader(packet, read_size, server_app_hp, EVP_aes_128_ecb(), header, id_of_client);
-                decoded_payload.resize(packet_info.payload_length);
-                p.UnprotectPayload(
-                    header,
-                    packet + packet_info.payload_offset, packet_info.payload_length, packet + packet_info.tag_offset,
-                    decoded_payload.data(),
-                    server_app_iv, server_app_key,
-                    packet_info.packet_number
+                packet_info = p.Unprotect(
+                        packet, read_size, server_app_hp, server_app_iv, server_app_key, header, decoded_payload, id_of_client
                 );
-
                 std::vector<std::unique_ptr<quic::QUICFrame>> frames = frame_parser.ParseAll(decoded_payload);
                 for(int i = 0;i < frames.size();i++){
                     if (frames[i] && frames[i]->FrameType() == quic::QUICFrameType::HANDSHAKE_DONE){
