@@ -1,2 +1,3 @@
 build/*
 quic/keylog.txt
+.vscode/
