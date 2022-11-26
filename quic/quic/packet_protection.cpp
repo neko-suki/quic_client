@@ -114,20 +114,16 @@ int PacketProtection::ProtectHeader(uint8_t header[], int header_sz,
 
     if ((header[0] & 0x80) != 0){
         header_type = LONG_HEADER;
-        packet_number_length = (0x03&header[0]) + 1;
-        int sample_begin = 4 - packet_number_length;
-        for(int i = 0;i < sample_sz;i++){
-            sample[i] = protected_payload[sample_begin+i];
-        }
     } else {
         header_type = SHORT_HEADER;
-        // short header
-        packet_number_length = (0x03&header[0]) + 1;
-        int sample_begin = 4 - packet_number_length;
-        for(int i = 0;i < sample_sz;i++){
-            sample[i] = protected_payload[sample_begin + i];
-        }
     }
+    packet_number_length = (0x03&header[0]) + 1;
+    int sample_begin = 4 - packet_number_length;
+    for(int i = 0;i < sample_sz;i++){
+        sample[i] = protected_payload[sample_begin + i];
+    }
+
+
     int mode = ENC;
     EVP_CIPHER_CTX *evp = NULL;
 
@@ -150,15 +146,13 @@ int PacketProtection::ProtectHeader(uint8_t header[], int header_sz,
 
     if (header_type == LONG_HEADER){
         header[0] ^= out[0] & 0x0f;
-        for(int i = packet_number_offset, mask=1; mask <= packet_number_length;i++, mask++){
-            header[i] ^= out[mask];
-        }
     } else {
         header[0] ^= out[0] & 0x1f;
-        for(int i = packet_number_offset, mask=1; mask <= packet_number_length;i++, mask++){
-            header[i] ^= out[mask];
-        }  
     }
+
+    for(int i = packet_number_offset, mask=1; mask <= packet_number_length;i++, mask++){
+        header[i] ^= out[mask];
+    }  
 
     EVP_CIPHER_CTX_free(evp);
 
