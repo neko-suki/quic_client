@@ -5,9 +5,8 @@
 #include "socket.hpp"
 
 namespace quic {
-OneRttPacket::OneRttPacket(std::vector<uint8_t> dst_id, std::vector<uint8_t> & client_app_hp, std::vector<uint8_t> & client_app_key, 
-        std::vector<uint8_t> & client_app_iv, uint64_t packet_number
-):packet_number_(packet_number), dst_id_(dst_id), client_app_hp_key_(client_app_hp), client_app_key_(client_app_key), client_app_iv_(client_app_iv) {}
+OneRttPacket::OneRttPacket(std::vector<uint8_t> dst_id, uint64_t packet_number
+):packet_number_(packet_number), dst_id_(dst_id) {}
 
 int OneRttPacket::CreateHeader(){
     VariableLengthInteger packet_number_v(packet_number_);
@@ -22,22 +21,18 @@ int OneRttPacket::CreateHeader(){
     return packet_number_offset;
 }
 
-
-void OneRttPacket::Send(Socket & sock){
-    if (payload_.size() < 100){
-        // padsding
-        for(int i = 0;i < 1000;i++){
-            payload_.push_back(0); 
+void OneRttPacket::Send(Socket & sock,
+        std::vector<uint8_t> & client_app_hp, std::vector<uint8_t> & client_app_key, std::vector<uint8_t> & client_app_iv
+    ){
+    if (payload_.size() < 1162){
+        // padding
+        while(payload_.size() < 1162){
+            payload_.push_back(0);
         }
     }
 
     int packet_number_offset = CreateHeader();
-    PacketProtection p;
-    
-    std::vector<uint8_t> encrypted_payload(payload_.size());
-    std::vector<uint8_t> tag(AES_BLOCK_SIZE);
 
-    int mode = DEC;
     unsigned char nonce[12] = {0};
     for(int i = 0;i < 8;i++){
         nonce[11-i] = (packet_number_ >> (i*8)) & 0xff;
@@ -45,18 +40,19 @@ void OneRttPacket::Send(Socket & sock){
 
     // client iv can be obtained
     for(int i = 0;i < 12;i++){
-        nonce[i] = nonce[i] ^ client_app_iv_[i];
+        nonce[i] = nonce[i] ^ client_app_iv[i];
     }
 
+    std::vector<uint8_t> encrypted_payload(payload_.size());
+    std::vector<uint8_t> tag(AES_BLOCK_SIZE);
 
-    int encrypted_size;
-
+    PacketProtection p;
     p.Protect(
         header_,
         payload_,
-        client_app_key_,
-        client_app_iv_,
-        client_app_hp_key_,
+        client_app_key,
+        client_app_iv,
+        client_app_hp,
         packet_number_,
         packet_number_offset,
         encrypted_payload,
@@ -70,7 +66,6 @@ void OneRttPacket::Send(Socket & sock){
 
     header_.clear();
     payload_.clear();
-    packet_number_++;
 }
 
 void OneRttPacket::AddFrame(std::vector<uint8_t> frame_binary){

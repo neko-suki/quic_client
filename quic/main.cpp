@@ -355,12 +355,11 @@ int main(){
                         printf("\n");
                     }
                 }
-
                 ack_manager.AddACK(packet_info.packet_number);
                 std::vector<uint8_t> ack_binary = ack_manager.GenFrameBinary();
-                quic::OneRttPacket one_rtt_packet(id_of_server, client_app_hp, client_app_key, client_app_iv, packet_number_manager.GetPacketNumber());
+                quic::OneRttPacket one_rtt_packet(id_of_server, packet_number_manager.GetPacketNumber());
                 one_rtt_packet.AddFrame(ack_binary);
-                one_rtt_packet.Send(sock);
+                one_rtt_packet.Send(sock, client_app_hp, client_app_key, client_app_iv);
             }
         }
     }
@@ -381,13 +380,9 @@ int main(){
             stream.SetFin();
             std::vector<uint8_t> stream_frame = stream.GetPayload();
 
-            quic::OneRttPacket one_rtt_packet(id_of_server, client_app_hp, client_app_key, client_app_iv, packet_number_manager.GetPacketNumber());
+            quic::OneRttPacket one_rtt_packet(id_of_server, packet_number_manager.GetPacketNumber());
             one_rtt_packet.AddFrame(stream_frame);
-            if (stream_frame.size() < 1162){
-                std::vector<uint8_t> padding(1162-stream_frame.size());
-                one_rtt_packet.AddFrame(padding);
-            }
-            one_rtt_packet.Send(sock);
+            one_rtt_packet.Send(sock, client_app_hp, client_app_key, client_app_iv);
         }
     }
 

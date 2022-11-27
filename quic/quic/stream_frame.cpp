@@ -27,7 +27,6 @@ void StreamFrame::Parse(std::vector<uint8_t> & buf, int & p){
         length_ = parse_variable_length_integer(buf, p);
     }
     std::copy(buf.begin()+p, buf.begin() + p + length_, std::back_inserter(stream_data_));
-    std::string buf_string(buf.data() + p, buf.data() + p + length_);
     p += length_;
 }
 
