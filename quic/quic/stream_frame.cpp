@@ -26,12 +26,13 @@ void StreamFrame::Parse(std::vector<uint8_t> & buf, int & p){
     if (type & 0x02){
         length_ = parse_variable_length_integer(buf, p);
     }
-    std::copy(buf.begin()+p, buf.begin() + length_, std::back_inserter(stream_data_));
+    std::copy(buf.begin()+p, buf.begin() + p + length_, std::back_inserter(stream_data_));
     std::string buf_string(buf.data() + p, buf.data() + p + length_);
-    printf("stream frame received. id: %lu, payload: %s\n", stream_id_, buf_string.c_str());
     p += length_;
-
 }
 
+std::vector<uint8_t> StreamFrame::stream_data(){
+    return stream_data_;
+}
 
 }

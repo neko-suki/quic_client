@@ -32,6 +32,7 @@
 #include "quic/one_rtt_packet.hpp"
 #include "quic/packet_number_manager.hpp"
 #include "quic/socket.hpp"
+#include "quic/stream_frame.hpp"
 #include "quic/stream_manager.hpp"
 #include "quic/util.hpp"
 
@@ -344,6 +345,14 @@ int main(){
                     if (frames[i] && frames[i]->FrameType() == quic::QUICFrameType::HANDSHAKE_DONE){
                         handshake_done = true;
                         cond.notify_one();
+                    } else if (frames[i] && (static_cast<int32_t>(frames[i]->FrameType()) & static_cast<int32_t>(quic::QUICFrameType::STREAM)) == static_cast<int32_t>(quic::QUICFrameType::STREAM)){
+                        quic::StreamFrame* p = reinterpret_cast<quic::StreamFrame*>(frames[i].get());
+                        std::vector<uint8_t> data = p->stream_data();
+                        printf("echo response: ");
+                        for(const auto & ch : data){
+                            printf("%c", ch);
+                        }
+                        printf("\n");
                     }
                 }
 

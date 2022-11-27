@@ -69,13 +69,6 @@ std::unique_ptr<QUICFrame> FrameParser::Parse(std::vector<uint8_t> & buf, int & 
                 p += 16; // skip stateless reset token
             }
             break;
-        case 0x19:
-            {
-                printf("RETIRE_CONNECTION_ID frame feceived\n"); 
-                p++; // type
-                uint64_t sequence_number = parse_variable_length_integer(buf.data(), p);
-                break;
-            }
         case 0x1e:
             {
                 ret = std::make_unique<HandshakeDoneFrame>();

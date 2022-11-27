@@ -25,5 +25,5 @@ public:
 QUICFrameType frame_type_;
 };
 
-}
+} // namespace quic
 #endif
