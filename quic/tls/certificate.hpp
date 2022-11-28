@@ -40,7 +40,7 @@ namespace tls {
 class CertificateEntry {
 public:
   CertificateEntry();
-  void Parse(std::vector<uint8_t> & buf, int &p);
+  void Parse(std::vector<uint8_t> &buf, int &p);
   uint8_t certificate_type_;
   std::vector<uint8_t> cert_data_;
 };
@@ -48,7 +48,7 @@ public:
 class Certificate {
 public:
   Certificate();
-  void Parse(std::vector<uint8_t> & buf, int &p);
+  void Parse(std::vector<uint8_t> &buf, int &p);
   CertificateEntry certificate_entry_;
 };
 

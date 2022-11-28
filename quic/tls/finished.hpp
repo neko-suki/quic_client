@@ -20,7 +20,7 @@ namespace tls {
 
 class Finished {
 public:
-  void Parse(std::vector<uint8_t> & buf, int &p);
+  void Parse(std::vector<uint8_t> &buf, int &p);
   uint32_t hash_length_;
   std::vector<uint8_t> verify_data_;
 };

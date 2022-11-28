@@ -58,7 +58,7 @@ namespace tls {
 
 class ServerHello {
 public:
-  void Parse(std::vector<uint8_t> & buf, int &p);
+  void Parse(std::vector<uint8_t> &buf, int &p);
   std::vector<uint8_t> GetSharedKey();
   std::vector<uint8_t> GetServerHello();
 

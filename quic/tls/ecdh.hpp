@@ -16,6 +16,7 @@ public:
   std::vector<uint8_t> GetPublicKey();
   void SetPeerPublicKey(std::vector<uint8_t> &public_key_vec);
   std::vector<uint8_t> GetSecret();
+
 private:
   EC_KEY *key;
   EC_POINT *peer;

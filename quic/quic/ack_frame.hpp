@@ -7,24 +7,24 @@
 
 #include "quic_frame.hpp"
 
-namespace quic{
+namespace quic {
 
-typedef struct{
-    uint64_t gap;
-    uint64_t ack_range_length;
+typedef struct {
+  uint64_t gap;
+  uint64_t ack_range_length;
 } ACKRange;
 
-class ACKFrame : public QUICFrame{
+class ACKFrame : public QUICFrame {
 public:
-    ACKFrame();
-    std::vector<uint8_t> GetBinary();
-    void Parse(std::vector<uint8_t> & buf, int & p);
-uint64_t larget_acknowledged_;
-uint64_t ack_delay_;
-uint64_t ack_range_count_;
-uint64_t first_ack_range_;
-std::vector<ACKRange> ack_range_;
+  ACKFrame();
+  std::vector<uint8_t> GetBinary();
+  void Parse(std::vector<uint8_t> &buf, int &p);
+  uint64_t larget_acknowledged_;
+  uint64_t ack_delay_;
+  uint64_t ack_range_count_;
+  uint64_t first_ack_range_;
+  std::vector<ACKRange> ack_range_;
 };
 
-}
+} // namespace quic
 #endif

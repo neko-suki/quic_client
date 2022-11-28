@@ -6,27 +6,27 @@
 
 #include <stdint.h>
 
-namespace quic{
+namespace quic {
 
-class Stream{
+class Stream {
 public:
-Stream(uint64_t id);
-void AddPayload(std::string & in);
-void SetFin();
-std::vector<uint8_t> GetPayload();
+  Stream(uint64_t id);
+  void AddPayload(std::string &in);
+  void SetFin();
+  std::vector<uint8_t> GetPayload();
 
 private:
-VariableLengthInteger stream_id_;
-std::vector<uint8_t> payload_;
-bool is_fin_;
+  VariableLengthInteger stream_id_;
+  std::vector<uint8_t> payload_;
+  bool is_fin_;
 };
 
-class StreamManager{
+class StreamManager {
 public:
-StreamManager();
-Stream CreateClientInitiatedBidirectionalStream();
+  StreamManager();
+  Stream CreateClientInitiatedBidirectionalStream();
 
 private:
-uint64_t client_initiated_bidirectional_stream_id_;
+  uint64_t client_initiated_bidirectional_stream_id_;
 };
-}
+} // namespace quic

@@ -17,8 +17,10 @@ https://www.rfc-editor.org/rfc/rfc9001.html#section-8.2
 namespace tls {
 class QUICTransportParameter : public Extension {
 public:
-  void SetInitialSourceConnectionID(std::vector<uint8_t> &initial_source_connection_id);
+  void SetInitialSourceConnectionID(
+      std::vector<uint8_t> &initial_source_connection_id);
   std::vector<uint8_t> GetBinary();
+
 private:
   std::vector<uint8_t> scid_;
 };

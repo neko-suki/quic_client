@@ -10,19 +10,18 @@
 #define QUIC_VARIABLE_LENGTH_INTEGER_HPP_
 
 #include <cassert>
-#include <vector>
 #include <stdint.h>
+#include <vector>
 
-namespace quic{
-class VariableLengthInteger{
+namespace quic {
+class VariableLengthInteger {
 public:
-VariableLengthInteger(int a);
-VariableLengthInteger(uint8_t a);
-VariableLengthInteger(uint64_t a);
-std::vector<uint8_t> GetBinary();
-uint64_t val_;
+  VariableLengthInteger(int a);
+  VariableLengthInteger(uint8_t a);
+  VariableLengthInteger(uint64_t a);
+  std::vector<uint8_t> GetBinary();
+  uint64_t val_;
 };
-} // namespace
-
+} // namespace quic
 
 #endif

@@ -61,8 +61,8 @@ class EncryptedExtensions {
 public:
   EncryptedExtensions();
   std::vector<uint8_t> GetBinary();
-  void Parse(std::vector<uint8_t> & buf, int &p);
- 
+  void Parse(std::vector<uint8_t> &buf, int &p);
+
   uint8_t msg_type_;
   uint32_t length_; // 24 as real
   ClientHello client_hello_;

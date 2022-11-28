@@ -23,46 +23,46 @@
 
 #include <vector>
 
-#include <stdint.h>
-#include <openssl/ssl.h>
 #include <openssl/aes.h>
+#include <openssl/ssl.h>
+#include <stdint.h>
 
 #include "../tls/ecdh.hpp"
 #include "ack_manager.hpp"
 #include "crypto_frame.hpp"
-#include "padding_frame.hpp"
-#include "packet_protection.hpp"
-#include "ssl_common.hpp"
 #include "initial_secret_generator.hpp"
+#include "packet_protection.hpp"
+#include "padding_frame.hpp"
+#include "ssl_common.hpp"
 
-
-namespace quic{
-class InitialPacket{
+namespace quic {
+class InitialPacket {
 public:
-    InitialPacket();
-    void Protect(InitialSecretGenerator & initial_secret_generator);
-    void CreateInitialPacket(std::vector<uint8_t> & scid, std::vector<uint8_t> & dcid);
-    void CreateAckPacket(std::vector<uint8_t> & scid, std::vector<uint8_t> & dcid);
-    std::vector<uint8_t> GetBinary();
-    tls::ECDH GetECDH();
-    std::vector<uint8_t> GetClientHello();
+  InitialPacket();
+  void Protect(InitialSecretGenerator &initial_secret_generator);
+  void CreateInitialPacket(std::vector<uint8_t> &scid,
+                           std::vector<uint8_t> &dcid);
+  void CreateAckPacket(std::vector<uint8_t> &scid, std::vector<uint8_t> &dcid);
+  std::vector<uint8_t> GetBinary();
+  tls::ECDH GetECDH();
+  std::vector<uint8_t> GetClientHello();
 
 private:
-    void CreateHeader(std::vector<uint8_t> & scid, std::vector<uint8_t> & dcid);
+  void CreateHeader(std::vector<uint8_t> &scid, std::vector<uint8_t> &dcid);
 
-std::vector<uint8_t> header_;
-std::vector<uint8_t> payload_;
-std::vector<uint8_t> protected_payload_;
-std::vector<uint8_t> tag_;
-int packet_number_offset_;
+  std::vector<uint8_t> header_;
+  std::vector<uint8_t> payload_;
+  std::vector<uint8_t> protected_payload_;
+  std::vector<uint8_t> tag_;
+  int packet_number_offset_;
 
-CryptoFrame crypto_frame_;
-PacketProtection packet_protection_;
-int packet_number_;
+  CryptoFrame crypto_frame_;
+  PacketProtection packet_protection_;
+  int packet_number_;
 
-ACKManager ack_manager;
+  ACKManager ack_manager;
 };
 
-} // namespace
+} // namespace quic
 
 #endif

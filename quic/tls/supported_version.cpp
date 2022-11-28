@@ -13,7 +13,7 @@ struct {
         case client_hello:
             ProtocolVersion versions<2..254>;
 
-        case server_hello: /* and HelloRetryRequest 
+        case server_hello: /* and HelloRetryRequest
             ProtocolVersion selected_version;
     };
 } SupportedVersions;
@@ -21,28 +21,28 @@ struct {
 
 #include "supported_version.hpp"
 
-namespace tls{
+namespace tls {
 SupportedVersion::SupportedVersion() {
-    extension_type_ = ExtentionType::supported_versions;
+  extension_type_ = ExtentionType::supported_versions;
 }
 
 std::vector<uint8_t> SupportedVersion::GetBinary() {
-    std::vector<uint8_t> ret;
-    // type: 0043 = 0x002b = 16*2 + 11
-    ret.push_back(0x00);
-    ret.push_back(0x2b);
+  std::vector<uint8_t> ret;
+  // type: 0043 = 0x002b = 16*2 + 11
+  ret.push_back(0x00);
+  ret.push_back(0x2b);
 
-    // length of extension
-    ret.push_back(0x00);
-    ret.push_back(0x03);
+  // length of extension
+  ret.push_back(0x00);
+  ret.push_back(0x03);
 
-    // length of versions
-    ret.push_back(0x02);
+  // length of versions
+  ret.push_back(0x02);
 
-    // 0x0304 = TLS 1.3
-    ret.push_back(0x03);
-    ret.push_back(0x04);
+  // 0x0304 = TLS 1.3
+  ret.push_back(0x03);
+  ret.push_back(0x04);
 
-    return ret;
+  return ret;
 }
 } // namespace tls

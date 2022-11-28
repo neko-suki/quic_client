@@ -63,7 +63,7 @@ class Handshake {
 public:
   Handshake();
   std::vector<uint8_t> GetBinary();
-  void Parse(std::vector<uint8_t> & buf, int &p);
+  void Parse(std::vector<uint8_t> &buf, int &p);
 
   std::vector<uint8_t> GetSharedKey();
   std::vector<uint8_t> GetServerHello();

@@ -40,9 +40,10 @@ class KeyShareEntry {
 public:
   void CreateKey();
   std::vector<uint8_t> GetBinary();
-  void Parse(std::vector<uint8_t> & buf, int &p);
+  void Parse(std::vector<uint8_t> &buf, int &p);
   std::vector<uint8_t> GetSharedKey();
   ECDH GetECDH();
+
 private:
   ECDH ecdh_;
   uint16_t named_group_;

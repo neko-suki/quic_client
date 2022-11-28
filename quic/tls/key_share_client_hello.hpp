@@ -40,6 +40,7 @@ public:
   void CreateKey();
   std::vector<uint8_t> GetBinary();
   ECDH GetECDH();
+
 private:
   std::vector<KeyShareEntry> client_shares_;
 };

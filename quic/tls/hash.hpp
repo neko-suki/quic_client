@@ -14,7 +14,7 @@ namespace tls {
 class Hash {
 public:
   std::vector<uint8_t> ComputeHash(size_t hash_length,
-                                    std::vector<uint8_t> &in);
+                                   std::vector<uint8_t> &in);
 };
 } // namespace tls
 

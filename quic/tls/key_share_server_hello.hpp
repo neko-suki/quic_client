@@ -38,9 +38,10 @@
 namespace tls {
 class KeyShareServerHello : public Extension {
 public:
-  std::vector<uint8_t> GetBinary() ;
-  void Parse(std::vector<uint8_t> & buf, int &p) ;
+  std::vector<uint8_t> GetBinary();
+  void Parse(std::vector<uint8_t> &buf, int &p);
   std::vector<uint8_t> GetSharedKey();
+
 private:
   KeyShareEntry server_share_;
 };
