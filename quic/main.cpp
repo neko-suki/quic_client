@@ -381,11 +381,11 @@ int main() {
       if (input.size() == 0)
         continue;
       printf("echo input: %s\n", input.c_str());
-      quic::Stream stream =
+      quic::StreamFrame stream =
           stream_manager.CreateClientInitiatedBidirectionalStream();
       stream.AddPayload(input);
       stream.SetFin();
-      std::vector<uint8_t> stream_frame = stream.GetPayload();
+      std::vector<uint8_t> stream_frame = stream.GetBinary();
 
       quic::OneRttPacket one_rtt_packet(
           id_of_server, packet_number_manager.GetPacketNumber());
