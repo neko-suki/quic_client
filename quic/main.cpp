@@ -116,13 +116,13 @@ int main() {
   std::vector<uint8_t> id_of_server = {0x83, 0x94, 0xc8, 0xf0,
                                        0x3e, 0x51, 0x57, 0x08};
 
-  quic::InitialSecretGenerator initial_secret_generator;
-  initial_secret_generator.GenerateKey(id_of_server);
-  // initial_secret_generator.print();
-
   // make initial packet
   quic::InitialPacket initial_packet;
   initial_packet.CreateInitialPacket(id_of_client, id_of_server);
+
+  quic::InitialSecretGenerator initial_secret_generator;
+  initial_secret_generator.GenerateKey(id_of_server);
+  // initial_secret_generator.print();
   initial_packet.Protect(initial_secret_generator);
 
   std::vector<uint8_t> initial_packet_binary = initial_packet.GetBinary();
