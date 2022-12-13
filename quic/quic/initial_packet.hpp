@@ -18,8 +18,7 @@
     }
 */
 
-#ifndef QUIC_INITIAL_PACKET_HPP_
-#define QUIC_INITIAL_PACKET_HPP_
+#pragma once
 
 #include <vector>
 
@@ -64,5 +63,3 @@ private:
 };
 
 } // namespace quic
-
-#endif

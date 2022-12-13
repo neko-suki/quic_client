@@ -64,7 +64,7 @@ ssize_t recvfrom(quic::Socket &sock, uint8_t *buf, const size_t buf_size) {
   return read_len;
 }
 
-int main() {
+int main(int argc, char **argv) {
   /*
   check hkdf extract
   std::vector<uint8_t> salt = {
