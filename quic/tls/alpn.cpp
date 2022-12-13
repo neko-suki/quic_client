@@ -21,8 +21,9 @@ std::vector<uint8_t> ALPN::GetBinary() {
               std::back_inserter(buf));
   }
 
-  uint8_t buf_length[2] = {static_cast<uint8_t>((buf.size() & 0xff00) >> 8),
-                           static_cast<uint8_t>(buf.size() & 0xff)};
+  uint8_t buf_length[2] = {
+      static_cast<uint8_t>((buf.size() & 0xff00) >> 8),
+      static_cast<uint8_t>(buf.size() & 0xff)};
 
   std::vector<uint8_t> extension;
   for (int i = 0; i < 2; i++) {

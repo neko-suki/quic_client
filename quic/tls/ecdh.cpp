@@ -57,7 +57,8 @@ std::vector<uint8_t> ECDH::GetSecret() {
 
   std::vector<uint8_t> secret(secret_len);
 
-  secret_len = ECDH_compute_key(secret.data(), secret_len, peer, key, NULL);
+  secret_len =
+      ECDH_compute_key(secret.data(), secret_len, peer, key, NULL);
   if (secret_len <= 0) {
     std::exit(1);
   }

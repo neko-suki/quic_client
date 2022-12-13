@@ -41,13 +41,15 @@ public:
   void Protect(InitialSecretGenerator &initial_secret_generator);
   void CreateInitialPacket(std::vector<uint8_t> &scid,
                            std::vector<uint8_t> &dcid);
-  void CreateAckPacket(std::vector<uint8_t> &scid, std::vector<uint8_t> &dcid);
+  void CreateAckPacket(std::vector<uint8_t> &scid,
+                       std::vector<uint8_t> &dcid);
   std::vector<uint8_t> GetBinary();
   tls::ECDH GetECDH();
   std::vector<uint8_t> GetClientHello();
 
 private:
-  void CreateHeader(std::vector<uint8_t> &scid, std::vector<uint8_t> &dcid);
+  void CreateHeader(std::vector<uint8_t> &scid,
+                    std::vector<uint8_t> &dcid);
 
   std::vector<uint8_t> header_;
   std::vector<uint8_t> payload_;

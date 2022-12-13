@@ -19,9 +19,9 @@ void Handshake::Protect(std::vector<uint8_t> &client_key,
   protected_payload_.resize(payload_.size());
   tag_.resize(AES_BLOCK_SIZE);
 
-  packet_protection_.Protect(header_, payload_, client_key, client_iv,
-                             client_hp_key, packet_number_,
-                             packet_number_offset_, protected_payload_, tag_);
+  packet_protection_.Protect(
+      header_, payload_, client_key, client_iv, client_hp_key,
+      packet_number_, packet_number_offset_, protected_payload_, tag_);
   packet_number_++;
 }
 

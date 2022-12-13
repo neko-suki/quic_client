@@ -10,7 +10,8 @@ void CryptoFrame::CreateFrame(
   // offset
   VariableLengthInteger offset(0);
   std::vector<uint8_t> tmp = offset.GetBinary();
-  std::copy(tmp.begin(), tmp.end(), std::back_inserter(crypto_frame_binary_));
+  std::copy(tmp.begin(), tmp.end(),
+            std::back_inserter(crypto_frame_binary_));
 
   // contents of crypto frame
   // handshake should be better
@@ -20,14 +21,17 @@ void CryptoFrame::CreateFrame(
   // length
   VariableLengthInteger length(client_hello_binary.size());
   tmp = length.GetBinary();
-  std::copy(tmp.begin(), tmp.end(), std::back_inserter(crypto_frame_binary_));
+  std::copy(tmp.begin(), tmp.end(),
+            std::back_inserter(crypto_frame_binary_));
 
   // crypto frame
   std::copy(client_hello_binary.begin(), client_hello_binary.end(),
             std::back_inserter(crypto_frame_binary_));
 }
 
-std::vector<uint8_t> CryptoFrame::GetBinary() { return crypto_frame_binary_; }
+std::vector<uint8_t> CryptoFrame::GetBinary() {
+  return crypto_frame_binary_;
+}
 
 // parse handshake protocol
 void CryptoFrame::Parse(std::vector<uint8_t> &buf, int &p) {

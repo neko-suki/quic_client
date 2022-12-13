@@ -139,7 +139,8 @@ int main(int argc, char **argv) {
   // server initial key
   std::vector<uint8_t> server_initial_hp_key =
       initial_secret_generator.server_hp_key();
-  std::vector<uint8_t> server_initial_iv = initial_secret_generator.server_iv();
+  std::vector<uint8_t> server_initial_iv =
+      initial_secret_generator.server_iv();
   std::vector<uint8_t> server_initial_key =
       initial_secret_generator.server_key();
   std::vector<uint8_t> header;
@@ -147,9 +148,9 @@ int main(int argc, char **argv) {
 
   // struct quic::PacketInfo packet_info = p.UnprotectHeader(packet,
   // packet_size, server_initial_hp_key, EVP_aes_128_ecb(), header);
-  struct quic::PacketInfo packet_info =
-      p.Unprotect(packet, packet_size, server_initial_hp_key, server_initial_iv,
-                  server_initial_key, header, decoded_payload);
+  struct quic::PacketInfo packet_info = p.Unprotect(
+      packet, packet_size, server_initial_hp_key, server_initial_iv,
+      server_initial_key, header, decoded_payload);
   id_of_server =
       packet_info.source_connection_id; // updated to choosed id by server
 
@@ -213,8 +214,8 @@ int main(int argc, char **argv) {
 
   int ptr = packet_info.tag_offset + 16;
   packet_info = p.Unprotect(packet + ptr, packet_size, server_handshake_hp,
-                            server_handshake_iv, server_handshake_key, header,
-                            decoded_payload);
+                            server_handshake_iv, server_handshake_key,
+                            header, decoded_payload);
 
   buf_pointer = 0;
   std::unique_ptr<quic::QUICFrame> handshake_frame =
@@ -241,7 +242,8 @@ int main(int argc, char **argv) {
         hash.ComputeHash(hash_length, merged_handshake);
 
     tls::HMAC hmac;
-    std::vector<uint8_t> finished_key = key_schedule.GetServerFinishedKey();
+    std::vector<uint8_t> finished_key =
+        key_schedule.GetServerFinishedKey();
     std::vector<uint8_t> verify_data =
         hmac.ComputeHMAC(finished_hash, finished_key);
 
@@ -326,9 +328,9 @@ int main(int argc, char **argv) {
       quic::PacketType packet_type = quic::IsLongHeaderPacket(packet);
       if (quic::PacketType::Handshake == packet_type) {
         printf("========== Handshake Packet received ==========\n");
-        packet_info = p.Unprotect(packet, read_size, server_handshake_hp,
-                                  server_handshake_iv, server_handshake_key,
-                                  header, decoded_payload);
+        packet_info = p.Unprotect(
+            packet, read_size, server_handshake_hp, server_handshake_iv,
+            server_handshake_key, header, decoded_payload);
         ptr = packet_info.tag_offset + AES_BLOCK_SIZE;
 
         buf_pointer = 0;
@@ -336,20 +338,21 @@ int main(int argc, char **argv) {
         printf("========== Parse Handshake Packet ACK end ==========\n");
       } else {
         printf("========== 1-RTT packet received ==========\n");
-        packet_info =
-            p.Unprotect(packet, read_size, server_app_hp, server_app_iv,
-                        server_app_key, header, decoded_payload, id_of_client);
+        packet_info = p.Unprotect(packet, read_size, server_app_hp,
+                                  server_app_iv, server_app_key, header,
+                                  decoded_payload, id_of_client);
         std::vector<std::unique_ptr<quic::QUICFrame>> frames =
             frame_parser.ParseAll(decoded_payload);
         for (int i = 0; i < frames.size(); i++) {
-          if (frames[i] &&
-              frames[i]->FrameType() == quic::QUICFrameType::HANDSHAKE_DONE) {
+          if (frames[i] && frames[i]->FrameType() ==
+                               quic::QUICFrameType::HANDSHAKE_DONE) {
             handshake_done = true;
             cond.notify_one();
           } else if (frames[i] &&
                      (static_cast<int32_t>(frames[i]->FrameType()) &
                       static_cast<int32_t>(quic::QUICFrameType::STREAM)) ==
-                         static_cast<int32_t>(quic::QUICFrameType::STREAM)) {
+                         static_cast<int32_t>(
+                             quic::QUICFrameType::STREAM)) {
             quic::StreamFrame *p =
                 reinterpret_cast<quic::StreamFrame *>(frames[i].get());
             std::vector<uint8_t> data = p->stream_data();
@@ -365,7 +368,8 @@ int main(int argc, char **argv) {
         quic::OneRttPacket one_rtt_packet(
             id_of_server, packet_number_manager.GetPacketNumber());
         one_rtt_packet.AddFrame(ack_binary);
-        one_rtt_packet.Send(sock, client_app_hp, client_app_key, client_app_iv);
+        one_rtt_packet.Send(sock, client_app_hp, client_app_key,
+                            client_app_iv);
       }
     }
   });
@@ -390,7 +394,8 @@ int main(int argc, char **argv) {
       quic::OneRttPacket one_rtt_packet(
           id_of_server, packet_number_manager.GetPacketNumber());
       one_rtt_packet.AddFrame(stream_frame);
-      one_rtt_packet.Send(sock, client_app_hp, client_app_key, client_app_iv);
+      one_rtt_packet.Send(sock, client_app_hp, client_app_key,
+                          client_app_iv);
     }
   }
 

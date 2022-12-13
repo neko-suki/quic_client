@@ -13,8 +13,8 @@ uint64_t parse_variable_length_integer(unsigned char *buf, int &p) {
     length = ((buf[p] & 0x3f) << 8) | (buf[p + 1]);
     p += 2;
   } else if (msb_2bit == 2) {
-    length = ((buf[p] & 0x3f) << 24) | (buf[p + 1] << 16) | (buf[p + 2] << 8) |
-             (buf[p + 3]);
+    length = ((buf[p] & 0x3f) << 24) | (buf[p + 1] << 16) |
+             (buf[p + 2] << 8) | (buf[p + 3]);
     p += 4;
   } else if (msb_2bit == 3) {
     length = ((unsigned long long)(buf[p] & 0x3f) << 56) |

@@ -25,13 +25,15 @@ std::vector<uint8_t> ACKManager::GenFrameBinary() {
 
   // ack_range_count
   VariableLengthInteger ack_range_count(0);
-  std::vector<uint8_t> ack_range_count_binary = ack_range_count.GetBinary();
+  std::vector<uint8_t> ack_range_count_binary =
+      ack_range_count.GetBinary();
   std::copy(ack_range_count_binary.begin(), ack_range_count_binary.end(),
             std::back_inserter(ack_frame_binary));
 
   // first_ack_range
   VariableLengthInteger first_ack_range(0);
-  std::vector<uint8_t> first_ack_range_binary = first_ack_range.GetBinary();
+  std::vector<uint8_t> first_ack_range_binary =
+      first_ack_range.GetBinary();
   std::copy(first_ack_range_binary.begin(), first_ack_range_binary.end(),
             std::back_inserter(ack_frame_binary));
 

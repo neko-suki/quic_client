@@ -20,7 +20,8 @@ namespace tls {
 class KeySchedule {
 public:
   KeySchedule() {}
-  void ComputeHandshakeKey(size_t hash_length, std::vector<uint8_t> &hello_hash,
+  void ComputeHandshakeKey(size_t hash_length,
+                           std::vector<uint8_t> &hello_hash,
                            std::vector<uint8_t> &shared_secret);
   void ComputeApplicationKey(size_t hash_length,
                              std::vector<uint8_t> &handshake_hash);

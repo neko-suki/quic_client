@@ -5,7 +5,8 @@
 #include "variable_length_integer.hpp"
 
 namespace quic {
-OneRttPacket::OneRttPacket(std::vector<uint8_t> dst_id, uint64_t packet_number)
+OneRttPacket::OneRttPacket(std::vector<uint8_t> dst_id,
+                           uint64_t packet_number)
     : packet_number_(packet_number), dst_id_(dst_id) {}
 
 int OneRttPacket::CreateHeader() {
@@ -48,8 +49,9 @@ void OneRttPacket::Send(Socket &sock, std::vector<uint8_t> &client_app_hp,
   std::vector<uint8_t> tag(AES_BLOCK_SIZE);
 
   PacketProtection p;
-  p.Protect(header_, payload_, client_app_key, client_app_iv, client_app_hp,
-            packet_number_, packet_number_offset, encrypted_payload, tag);
+  p.Protect(header_, payload_, client_app_key, client_app_iv,
+            client_app_hp, packet_number_, packet_number_offset,
+            encrypted_payload, tag);
 
   std::vector<uint8_t> send_binary = std::move(header_);
   std::copy(encrypted_payload.begin(), encrypted_payload.end(),

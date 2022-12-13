@@ -60,7 +60,8 @@ class ClientHello {
 public:
   ClientHello() = default;
 
-  void CreateClientHello(std::vector<uint8_t> &initial_source_connection_id);
+  void
+  CreateClientHello(std::vector<uint8_t> &initial_source_connection_id);
   std::vector<uint8_t> GetBinary();
 
   ECDH GetECDH();

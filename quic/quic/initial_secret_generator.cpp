@@ -4,7 +4,8 @@
 
 namespace quic {
 
-void InitialSecretGenerator::GenerateKey(const std::vector<uint8_t> &dcid) {
+void InitialSecretGenerator::GenerateKey(
+    const std::vector<uint8_t> &dcid) {
   const std::vector<uint8_t> initial_salt = {
       0x38, 0x76, 0x2c, 0xf7, 0xf5, 0x59, 0x34, 0xb3, 0x4d, 0x17,
       0x9a, 0xe6, 0xa4, 0xc8, 0x0c, 0xad, 0xcc, 0xbb, 0x7f, 0x0a};
@@ -18,11 +19,13 @@ void InitialSecretGenerator::GenerateKey(const std::vector<uint8_t> &dcid) {
 
   client_key_ = hkdf.ExpandLabel(client_secret_, "quic key", context, 16);
   client_iv_ = hkdf.ExpandLabel(client_secret_, "quic iv", context, 12);
-  client_hp_key_ = hkdf.ExpandLabel(client_secret_, "quic hp", context, 16);
+  client_hp_key_ =
+      hkdf.ExpandLabel(client_secret_, "quic hp", context, 16);
 
   server_key_ = hkdf.ExpandLabel(server_secret_, "quic key", context, 16);
   server_iv_ = hkdf.ExpandLabel(server_secret_, "quic iv", context, 12);
-  server_hp_key_ = hkdf.ExpandLabel(server_secret_, "quic hp", context, 16);
+  server_hp_key_ =
+      hkdf.ExpandLabel(server_secret_, "quic hp", context, 16);
 }
 
 void InitialSecretGenerator::print_vec(std::string name,
@@ -49,7 +52,9 @@ void InitialSecretGenerator::print() {
 std::vector<uint8_t> InitialSecretGenerator::client_key() {
   return client_key_;
 }
-std::vector<uint8_t> InitialSecretGenerator::client_iv() { return client_iv_; }
+std::vector<uint8_t> InitialSecretGenerator::client_iv() {
+  return client_iv_;
+}
 std::vector<uint8_t> InitialSecretGenerator::client_hp_key() {
   return client_hp_key_;
 }
@@ -57,7 +62,9 @@ std::vector<uint8_t> InitialSecretGenerator::client_hp_key() {
 std::vector<uint8_t> InitialSecretGenerator::server_key() {
   return server_key_;
 }
-std::vector<uint8_t> InitialSecretGenerator::server_iv() { return server_iv_; }
+std::vector<uint8_t> InitialSecretGenerator::server_iv() {
+  return server_iv_;
+}
 std::vector<uint8_t> InitialSecretGenerator::server_hp_key() {
   return server_hp_key_;
 }

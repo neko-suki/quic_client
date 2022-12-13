@@ -30,34 +30,32 @@ Handshake Packet {
 }
 */
 
-struct PacketInfo ParsePacket::Unprotect(unsigned char *packet, int packet_sz,
-                                         const std::vector<uint8_t> &hp_key,
-                                         const std::vector<uint8_t> &iv,
-                                         const std::vector<uint8_t> &key,
-                                         std::vector<uint8_t> &header,
-                                         std::vector<uint8_t> &decoded_payload,
-                                         const std::vector<uint8_t> dcid) {
+struct PacketInfo ParsePacket::Unprotect(
+    unsigned char *packet, int packet_sz,
+    const std::vector<uint8_t> &hp_key, const std::vector<uint8_t> &iv,
+    const std::vector<uint8_t> &key, std::vector<uint8_t> &header,
+    std::vector<uint8_t> &decoded_payload,
+    const std::vector<uint8_t> dcid) {
   int tag_sz = AES_BLOCK_SIZE;
   uint64_t packet_number;
   const EVP_CIPHER *cipher_suite = EVP_aes_128_ecb();
 
-  struct PacketInfo packet_info =
-      UnprotectHeader(packet, packet_sz, hp_key, cipher_suite, header, dcid);
+  struct PacketInfo packet_info = UnprotectHeader(
+      packet, packet_sz, hp_key, cipher_suite, header, dcid);
   decoded_payload.resize(packet_info.payload_length);
 
   UnprotectPayload(header, packet + packet_info.payload_offset,
-                   packet_info.payload_length, packet + packet_info.tag_offset,
-                   decoded_payload.data(), iv, key, packet_info.packet_number);
+                   packet_info.payload_length,
+                   packet + packet_info.tag_offset, decoded_payload.data(),
+                   iv, key, packet_info.packet_number);
 
   return packet_info;
 }
 
-struct PacketInfo ParsePacket::UnprotectHeader(unsigned char packet[],
-                                               int packet_sz,
-                                               const std::vector<uint8_t> &key,
-                                               const EVP_CIPHER *cipher_suite,
-                                               std::vector<uint8_t> &header,
-                                               std::vector<uint8_t> dcid) {
+struct PacketInfo ParsePacket::UnprotectHeader(
+    unsigned char packet[], int packet_sz, const std::vector<uint8_t> &key,
+    const EVP_CIPHER *cipher_suite, std::vector<uint8_t> &header,
+    std::vector<uint8_t> dcid) {
   header.clear();
   int header_type;
   int pn_offset;
@@ -177,7 +175,8 @@ struct PacketInfo ParsePacket::UnprotectHeader(unsigned char packet[],
   ret.tag_offset = ret.payload_offset + ret.payload_length - 16;
   ret.payload_length -= 16;
 
-  std::copy(packet, packet + ret.payload_offset, std::back_inserter(header));
+  std::copy(packet, packet + ret.payload_offset,
+            std::back_inserter(header));
   return ret;
 }
 
@@ -225,8 +224,8 @@ void ParsePacket::UnprotectPayload(std::vector<uint8_t> &header,
     return;
   }
 
-  if (EVP_CipherUpdate(evp, original_payload, &original_payload_sz, payload,
-                       payload_sz) != SSL_SUCCESS) {
+  if (EVP_CipherUpdate(evp, original_payload, &original_payload_sz,
+                       payload, payload_sz) != SSL_SUCCESS) {
     fprintf(stderr, "ERROR: EVP_CipherUpdate\n");
     return;
   }
@@ -239,10 +238,11 @@ void ParsePacket::UnprotectPayload(std::vector<uint8_t> &header,
     return;
   }
 
-  int test =
-      EVP_CipherFinal_ex(evp, original_payload + tmp_len, &original_payload_sz);
+  int test = EVP_CipherFinal_ex(evp, original_payload + tmp_len,
+                                &original_payload_sz);
   if (test <= 0 && ERR_get_error() != 0) {
-    fprintf(stderr, "ERROR: EVP_CipherFinal_ex failed. OpenSSL error: %s\n",
+    fprintf(stderr,
+            "ERROR: EVP_CipherFinal_ex failed. OpenSSL error: %s\n",
             ERR_error_string(ERR_get_error(), NULL));
     return;
   }

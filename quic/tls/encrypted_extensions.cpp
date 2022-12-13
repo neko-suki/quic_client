@@ -2,7 +2,8 @@
 
 namespace tls {
 EncryptedExtensions::EncryptedExtensions()
-    : msg_type_(static_cast<uint8_t>(HandshakeType::encrypted_extensions)) {}
+    : msg_type_(
+          static_cast<uint8_t>(HandshakeType::encrypted_extensions)) {}
 
 std::vector<uint8_t> EncryptedExtensions::GetBinary() {
   std::vector<uint8_t> ret;
@@ -30,7 +31,8 @@ void EncryptedExtensions::Parse(std::vector<uint8_t> &buf, int &p) {
   */
   uint32_t encrypted_extension_length = (buf[p] << 8) | (buf[p + 1]);
   p += 2;
-  // std::cout << "EncryptedExtensions: length " << encrypted_extension_length
+  // std::cout << "EncryptedExtensions: length " <<
+  // encrypted_extension_length
   //          << std::endl;
   while (p < encrypted_extension_length) {
     uint16_t extension_type = buf[p] << 8 | buf[p + 1];

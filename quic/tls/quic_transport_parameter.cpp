@@ -27,8 +27,8 @@ std::vector<uint8_t> QUICTransportParameter::GetBinary() {
   std::vector<uint8_t> buf;
   std::vector<uint8_t> ins_buf;
   // initial_source_connection_id (0x0f):
-  // This is the value that the endpoint included in the Source Connection ID
-  // field of the first Initial packet it sends for the connection; see
+  // This is the value that the endpoint included in the Source Connection
+  // ID field of the first Initial packet it sends for the connection; see
   // Section 7.3.
   {
     // transport parameter id
@@ -71,7 +71,8 @@ std::vector<uint8_t> QUICTransportParameter::GetBinary() {
     ins_buf = initial_max_stream_data_bidi_local_v.GetBinary();
     std::copy(ins_buf.begin(), ins_buf.end(), std::back_inserter(buf));
 
-    quic::VariableLengthInteger initial_max_stream_data_bidi_local(3750000);
+    quic::VariableLengthInteger initial_max_stream_data_bidi_local(
+        3750000);
     std::vector<uint8_t> initial_max_stream_data_bidi_local_binary =
         initial_max_stream_data_bidi_local.GetBinary();
 

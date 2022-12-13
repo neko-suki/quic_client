@@ -53,7 +53,9 @@ void KeyShareEntry::Parse(std::vector<uint8_t> &buf, int &p) {
   p += key_exchange_length;
 }
 
-std::vector<uint8_t> KeyShareEntry::GetSharedKey() { return key_exchange_; }
+std::vector<uint8_t> KeyShareEntry::GetSharedKey() {
+  return key_exchange_;
+}
 
 ECDH KeyShareEntry::GetECDH() { return ecdh_; }
 } // namespace tls

@@ -20,7 +20,8 @@ std::vector<uint8_t> HMAC::ComputeHMAC(std::vector<uint8_t> &in,
     std::exit(1);
   }
 
-  if (HMAC_Init_ex(hctx, key.data(), key.size(), md, NULL) != SSL_SUCCESS) {
+  if (HMAC_Init_ex(hctx, key.data(), key.size(), md, NULL) !=
+      SSL_SUCCESS) {
     fprintf(stderr, "HMAC_Init failed.\n");
     std::exit(1);
   }

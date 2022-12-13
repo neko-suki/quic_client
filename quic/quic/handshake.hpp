@@ -25,7 +25,8 @@ private:
   void CreateCryptoFrame(std::vector<uint8_t> &verify_data);
   void CreateACKFrame();
   void CreatePaddingFrame();
-  void CreateHeader(std::vector<uint8_t> &scid, std::vector<uint8_t> &dcid);
+  void CreateHeader(std::vector<uint8_t> &scid,
+                    std::vector<uint8_t> &dcid);
 
   PacketProtection packet_protection_;
   std::vector<uint8_t> header_;

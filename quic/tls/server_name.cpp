@@ -23,7 +23,8 @@ std::vector<uint8_t> ServerName::GetBinary() {
   std::copy(server_name_length, server_name_length + 2,
             std::back_inserter(buf));
 
-  std::copy(server_name.begin(), server_name.end(), std::back_inserter(buf));
+  std::copy(server_name.begin(), server_name.end(),
+            std::back_inserter(buf));
 
   uint8_t length[2] = {static_cast<uint8_t>((buf.size() & 0xff00) >> 8),
                        static_cast<uint8_t>(buf.size() & 0xff)};
@@ -32,8 +33,9 @@ std::vector<uint8_t> ServerName::GetBinary() {
   std::copy(length, length + 2, std::back_inserter(tmp));
   std::copy(buf.begin(), buf.end(), std::back_inserter(tmp));
 
-  uint8_t tmp_length[2] = {static_cast<uint8_t>((tmp.size() & 0xff00) >> 8),
-                           static_cast<uint8_t>(tmp.size() & 0xff)};
+  uint8_t tmp_length[2] = {
+      static_cast<uint8_t>((tmp.size() & 0xff00) >> 8),
+      static_cast<uint8_t>(tmp.size() & 0xff)};
   for (int i = 0; i < 2; i++) {
     ret.push_back(tmp_length[i]);
   }

@@ -14,7 +14,7 @@ public:
 
 private:
   uint64_t largest_acked_;
-  // std::vector<std::pair<int,int>> unack_range; not implemented for the time
-  // being.
+  // std::vector<std::pair<int,int>> unack_range; not implemented for the
+  // time being.
 };
 } // namespace quic

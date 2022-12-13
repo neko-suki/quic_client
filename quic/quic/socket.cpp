@@ -20,8 +20,9 @@ void Socket::Send(std::vector<uint8_t> &packet) {
   servaddr.sin_port = htons(port);
   servaddr.sin_addr.s_addr = INADDR_ANY;
 
-  sendto(sock_, (const unsigned char *)packet.data(), packet_sz, MSG_CONFIRM,
-         (const struct sockaddr *)&servaddr, sizeof(servaddr));
+  sendto(sock_, (const unsigned char *)packet.data(), packet_sz,
+         MSG_CONFIRM, (const struct sockaddr *)&servaddr,
+         sizeof(servaddr));
   // printf("Packet is sent.\n");
 }
 } // namespace quic

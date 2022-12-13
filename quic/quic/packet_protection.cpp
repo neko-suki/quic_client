@@ -5,21 +5,24 @@ void PacketProtection::Protect(
     std::vector<uint8_t> &header, const std::vector<uint8_t> &payload,
     const std::vector<uint8_t> &key, const std::vector<uint8_t> &iv,
     const std::vector<uint8_t> &hp_key, const uint64_t packet_number,
-    const int packet_number_offset, std::vector<uint8_t> &protected_payload,
-    std::vector<uint8_t> &tag) {
+    const int packet_number_offset,
+    std::vector<uint8_t> &protected_payload, std::vector<uint8_t> &tag) {
   int protected_payload_sz;
-  ProtectPayload(header.data(), header.size(), payload.data(), payload.size(),
-                 protected_payload.data(), &protected_payload_sz, key.data(),
-                 key.size(), iv.data(), iv.size(), tag.data(), packet_number);
+  ProtectPayload(header.data(), header.size(), payload.data(),
+                 payload.size(), protected_payload.data(),
+                 &protected_payload_sz, key.data(), key.size(), iv.data(),
+                 iv.size(), tag.data(), packet_number);
   ProtectHeader(header.data(), header.size(), protected_payload.data(),
-                protected_payload.size(), hp_key.data(), packet_number_offset);
+                protected_payload.size(), hp_key.data(),
+                packet_number_offset);
 }
 
 int PacketProtection::ProtectPayload(
-    const uint8_t header[], const size_t header_sz, const uint8_t payload[],
-    const int payload_sz, uint8_t protected_payload[],
-    int *protected_payload_sz, const uint8_t key[], const int key_sz,
-    const uint8_t iv[], const int iv_sz, uint8_t tag[AES_BLOCK_SIZE],
+    const uint8_t header[], const size_t header_sz,
+    const uint8_t payload[], const int payload_sz,
+    uint8_t protected_payload[], int *protected_payload_sz,
+    const uint8_t key[], const int key_sz, const uint8_t iv[],
+    const int iv_sz, uint8_t tag[AES_BLOCK_SIZE],
     const uint64_t packet_number) {
 
   // Associated data is QUIC header.
@@ -27,10 +30,9 @@ int PacketProtection::ProtectPayload(
   std::copy(header, header + header_sz, associated_data);
   int associated_data_sz = header_sz;
 
-  // The 62 bits of the reconstructed QUIC packet number in network byte order
-  // are left-padded with zeros to the size of the IV.
-  // The exclusive OR of the padded packet number and the IV forms the AEAD
-  // nonce.
+  // The 62 bits of the reconstructed QUIC packet number in network byte
+  // order are left-padded with zeros to the size of the IV. The exclusive
+  // OR of the padded packet number and the IV forms the AEAD nonce.
   unsigned char nonce[12] = {0};
   for (int i = 0; i < 8; i++) {
     nonce[11 - i] = (packet_number >> (i * 8)) & 0xff;
@@ -51,7 +53,8 @@ int PacketProtection::ProtectPayload(
     return 0;
   }
 
-  if (EVP_CipherInit(evp, EVP_aes_128_gcm(), key, nonce, mode) != SSL_SUCCESS) {
+  if (EVP_CipherInit(evp, EVP_aes_128_gcm(), key, nonce, mode) !=
+      SSL_SUCCESS) {
     fprintf(stderr, "ERROR: EVP_EncryptInit\n");
     EVP_CIPHER_CTX_free(evp);
     return 0;
@@ -64,8 +67,8 @@ int PacketProtection::ProtectPayload(
     return 0;
   }
 
-  if (EVP_CipherUpdate(evp, protected_payload, protected_payload_sz, payload,
-                       payload_sz) != SSL_SUCCESS) {
+  if (EVP_CipherUpdate(evp, protected_payload, protected_payload_sz,
+                       payload, payload_sz) != SSL_SUCCESS) {
     fprintf(stderr, "ERROR: EVP_CipherUpdate\n");
     EVP_CIPHER_CTX_free(evp);
     return 0;
@@ -119,7 +122,8 @@ int PacketProtection::ProtectHeader(uint8_t header[], int header_sz,
     return 0;
   }
 
-  if (EVP_CipherInit(evp, EVP_aes_128_ecb(), key, NULL, mode) != SSL_SUCCESS) {
+  if (EVP_CipherInit(evp, EVP_aes_128_ecb(), key, NULL, mode) !=
+      SSL_SUCCESS) {
     fprintf(stderr, "ERROR: header_protection EVP_EncryptionInit\n");
     return 0;
   }
@@ -138,8 +142,8 @@ int PacketProtection::ProtectHeader(uint8_t header[], int header_sz,
     header[0] ^= out[0] & 0x1f;
   }
 
-  for (int i = packet_number_offset, mask = 1; mask <= packet_number_length;
-       i++, mask++) {
+  for (int i = packet_number_offset, mask = 1;
+       mask <= packet_number_length; i++, mask++) {
     header[i] ^= out[mask];
   }
 

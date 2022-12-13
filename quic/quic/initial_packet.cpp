@@ -3,7 +3,8 @@
 namespace quic {
 InitialPacket::InitialPacket() : packet_number_(0) {}
 
-void InitialPacket::Protect(InitialSecretGenerator &initial_secret_generator) {
+void InitialPacket::Protect(
+    InitialSecretGenerator &initial_secret_generator) {
   protected_payload_.resize(payload_.size());
   std::vector<uint8_t> key = initial_secret_generator.client_key();
   std::vector<uint8_t> iv = initial_secret_generator.client_iv();
@@ -11,8 +12,9 @@ void InitialPacket::Protect(InitialSecretGenerator &initial_secret_generator) {
 
   tag_.resize(AES_BLOCK_SIZE);
 
-  packet_protection_.Protect(header_, payload_, key, iv, hp_key, packet_number_,
-                             packet_number_offset_, protected_payload_, tag_);
+  packet_protection_.Protect(header_, payload_, key, iv, hp_key,
+                             packet_number_, packet_number_offset_,
+                             protected_payload_, tag_);
 
   packet_number_++;
 }

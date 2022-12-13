@@ -57,8 +57,10 @@ std::unique_ptr<QUICFrame> FrameParser::Parse(std::vector<uint8_t> &buf,
   case 0x18: {
     printf("NEW_CONNECTION_ID frame received\n");
     p++; // type;
-    uint64_t sequence_number = parse_variable_length_integer(buf.data(), p);
-    uint64_t retire_prior_to = parse_variable_length_integer(buf.data(), p);
+    uint64_t sequence_number =
+        parse_variable_length_integer(buf.data(), p);
+    uint64_t retire_prior_to =
+        parse_variable_length_integer(buf.data(), p);
     uint8_t length = buf[p];
     p++;
     p += length;

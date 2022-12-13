@@ -3,7 +3,8 @@
 #include "stream_frame.hpp"
 
 namespace quic {
-StreamManager::StreamManager() : client_initiated_bidirectional_stream_id_(0) {}
+StreamManager::StreamManager()
+    : client_initiated_bidirectional_stream_id_(0) {}
 
 StreamFrame StreamManager::CreateClientInitiatedBidirectionalStream() {
   /*

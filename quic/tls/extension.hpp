@@ -37,7 +37,10 @@ https://www.rfc-editor.org/rfc/rfc8446.html#section-4.2
 
 namespace tls {
 
-enum class ExtentionType { supported_versions = 43, signature_algorithm = 50 };
+enum class ExtentionType {
+  supported_versions = 43,
+  signature_algorithm = 50
+};
 
 class Extension {
 public:
