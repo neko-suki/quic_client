@@ -33,8 +33,7 @@ CIpherCuite
 
 */
 
-#ifndef TLS_CLIENT_HELLO_HPP_
-#define TLS_CLIENT_HELLO_HPP_
+#pragma once
 
 #include <algorithm>
 #include <vector>
@@ -85,4 +84,3 @@ public:
 };
 
 } // namespace tls
-#endif

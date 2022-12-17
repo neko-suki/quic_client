@@ -7,8 +7,7 @@
     }
 */
 
-#ifndef QUIC_CRYPTO_FRAME_HPP_
-#define QUIC_CRYPTO_FRAME_HPP_
+#pragma once
 
 #include <stdint.h>
 #include <vector>
@@ -43,5 +42,3 @@ private:
   std::vector<uint8_t> crypto_frame_binary_;
 };
 } // namespace quic
-
-#endif

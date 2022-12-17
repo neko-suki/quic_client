@@ -50,22 +50,28 @@ void ClientHello::CreateClientHello(
   std::vector<uint8_t> extension = supported_versions_.GetBinary();
   std::copy(extension.begin(), extension.end(),
             std::back_inserter(extensions));
+
   extension = named_group_list_.GetBinary();
   std::copy(extension.begin(), extension.end(),
             std::back_inserter(extensions));
+
   key_share_client_hello_.CreateKey();
   extension = key_share_client_hello_.GetBinary();
   std::copy(extension.begin(), extension.end(),
             std::back_inserter(extensions));
+
   extension = signature_algorithm_.GetBinary();
   std::copy(extension.begin(), extension.end(),
             std::back_inserter(extensions));
+
   extension = server_name_.GetBinary();
   std::copy(extension.begin(), extension.end(),
             std::back_inserter(extensions));
+
   extension = alpn_.GetBinary();
   std::copy(extension.begin(), extension.end(),
             std::back_inserter(extensions));
+
   quic_transport_parameter_.SetInitialSourceConnectionID(
       initial_source_connection_id);
   extension = quic_transport_parameter_.GetBinary();
