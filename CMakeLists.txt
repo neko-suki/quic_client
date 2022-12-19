@@ -21,7 +21,7 @@ quic/tls/certificate_verify.cpp
 quic/tls/ecdh.cpp
 quic/tls/encrypted_extensions.cpp
 quic/tls/finished.cpp
-quic/tls/supported_version.cpp
+quic/tls/supported_versions.cpp
 quic/tls/supported_groups.cpp
 quic/tls/key_schedule.cpp
 quic/tls/key_share.cpp
