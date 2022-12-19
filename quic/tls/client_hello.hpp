@@ -72,7 +72,7 @@ public:
   std::vector<uint8_t> legacy_session_id;
   std::vector<CipherSuite> cipher_suites;
 
-  SupportedVersion supported_versions_;
+  SupportedVersions supported_versions_;
   NamedGroupList named_group_list_;
   KeyShareClientHello key_share_client_hello_;
   SignatureAlgorithm signature_algorithm_;

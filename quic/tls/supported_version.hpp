@@ -16,8 +16,7 @@ Implementations of this specification MUST send this extension in the
         };
     } SupportedVersions;
 */
-#ifndef TLS_SUPPORTED_VERSION_HPP_
-#define TLS_SUPPORTED_VERSION_HPP_
+#pragma once
 #include <vector>
 
 #include <stdint.h>
@@ -25,11 +24,9 @@ Implementations of this specification MUST send this extension in the
 #include "extension.hpp"
 
 namespace tls {
-class SupportedVersion : public Extension {
+class SupportedVersions : public Extension {
 public:
-  SupportedVersion();
+  SupportedVersions();
   std::vector<uint8_t> GetBinary();
 };
 } // namespace tls
-
-#endif

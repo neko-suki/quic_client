@@ -67,7 +67,7 @@ private:
   Random random;
   std::vector<uint8_t> legacy_session_id_echo_;
   CipherSuite cipher_suite_;
-  SupportedVersion supported_versions_;
+  SupportedVersions supported_versions_;
   KeyShareServerHello key_share_server_hello_;
   std::vector<uint8_t> server_hello_payload_;
 };

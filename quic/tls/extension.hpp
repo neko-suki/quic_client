@@ -31,8 +31,7 @@ https://www.rfc-editor.org/rfc/rfc8446.html#section-4.2
         (65535)
     } ExtensionType;
 */
-#ifndef TLS_EXTENSION_HPP_
-#define TLS_EXTENSION_HPP_
+#pragma once
 #include <vector>
 
 namespace tls {
@@ -50,4 +49,3 @@ public:
   ExtentionType extension_type_;
 };
 } // namespace tls
-#endif

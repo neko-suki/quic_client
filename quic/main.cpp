@@ -17,7 +17,6 @@
 #include "tls/hmac.hpp"
 #include "tls/key_schedule.hpp"
 #include "tls/supported_groups.hpp"
-#include "tls/supported_version.hpp"
 
 #include "quic/frame_parser.hpp"
 #include "quic/initial_packet.hpp"

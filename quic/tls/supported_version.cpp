@@ -22,11 +22,11 @@ struct {
 #include "supported_version.hpp"
 
 namespace tls {
-SupportedVersion::SupportedVersion() {
+SupportedVersions::SupportedVersions() {
   extension_type_ = ExtentionType::supported_versions;
 }
 
-std::vector<uint8_t> SupportedVersion::GetBinary() {
+std::vector<uint8_t> SupportedVersions::GetBinary() {
   std::vector<uint8_t> ret;
   // type: 0043 = 0x002b = 16*2 + 11
   ret.push_back(0x00);
