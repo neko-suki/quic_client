@@ -13,16 +13,12 @@ bool ECDH::CreateKey(void) {
     return false;
   }
 
-  // printf("key is valid? (valid is 1, invalid is 0): %d\n",
-  //       EC_KEY_check_key(key));
-
   // EC_KEY_print_fp(stdout, key, 0);
 
   return true;
 }
 
 std::vector<uint8_t> ECDH::GetPublicKey() {
-  // EC_KEY_print_fp(stdout, key, 0);
   int size = i2o_ECPublicKey(key, nullptr);
   unsigned char *buf = new unsigned char[size];
   std::vector<uint8_t> ret(size);

@@ -1,5 +1,4 @@
-#ifndef TLS_ECDH_HPP_
-#define TLS_ECDH_HPP_
+#pragma once
 
 #include <iostream>
 #include <vector>
@@ -23,5 +22,3 @@ private:
 };
 
 } // namespace tls
-
-#endif
