@@ -36,6 +36,7 @@ namespace tls {
 
 class KeyShareClientHello : public Extension {
 public:
+  KeyShareClientHello();
   void CreateKey();
   std::vector<uint8_t> GetBinary();
   ECDH GetECDH();

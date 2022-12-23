@@ -39,7 +39,8 @@ namespace tls {
 enum class ExtentionType {
   supported_groups = 10,
   supported_versions = 43,
-  signature_algorithm = 50
+  signature_algorithm = 50,
+  key_share_client_hello = 51,
 };
 
 class Extension {
