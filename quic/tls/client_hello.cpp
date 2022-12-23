@@ -51,7 +51,7 @@ void ClientHello::CreateClientHello(
   std::copy(extension.begin(), extension.end(),
             std::back_inserter(extensions));
 
-  extension = named_group_list_.GetBinary();
+  extension = supported_group_.GetBinary();
   std::copy(extension.begin(), extension.end(),
             std::back_inserter(extensions));
 

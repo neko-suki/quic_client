@@ -2,10 +2,10 @@
 
 namespace tls {
 
-NamedGroupList::NamedGroupList() {
+SupportedGroups::SupportedGroups() {
 }
 
-std::vector<uint8_t> NamedGroupList::GetBinary() {
+std::vector<uint8_t> SupportedGroups::GetBinary() {
   std::vector<uint8_t> ret;
   // supported_groups(0x0010)
   ret.push_back(0x00);

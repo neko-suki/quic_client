@@ -73,7 +73,7 @@ public:
   std::vector<CipherSuite> cipher_suites;
 
   SupportedVersions supported_versions_;
-  NamedGroupList named_group_list_;
+  SupportedGroups supported_group_;
   KeyShareClientHello key_share_client_hello_;
   SignatureAlgorithm signature_algorithm_;
   ServerName server_name_;

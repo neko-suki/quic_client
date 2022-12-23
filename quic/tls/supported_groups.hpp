@@ -20,8 +20,7 @@ https://www.rfc-editor.org/rfc/rfc8446.html#section-4.2.7
           NamedGroup named_group_list<2..2^16-1>;
       } NamedGroupList;
 */
-#ifndef TLS_SUPPORTED_GROUPS_HPP_
-#define TLS_SUPPORTED_GROUPS_HPP_
+#pragma once
 #include <stdint.h>
 #include <vector>
 
@@ -29,11 +28,10 @@ https://www.rfc-editor.org/rfc/rfc8446.html#section-4.2.7
 
 namespace tls {
 
-class NamedGroupList : public Extension {
+class SupportedGroups : public Extension {
 public:
-  NamedGroupList();
+  SupportedGroups();
   std::vector<uint8_t> GetBinary();
   std::vector<uint8_t> named_group_list;
 };
 } // namespace tls
-#endif

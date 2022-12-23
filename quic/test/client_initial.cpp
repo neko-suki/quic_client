@@ -2,6 +2,7 @@
 #include <vector>
 
 #include "../quic/packet_protection.hpp"
+#include "../tls/supported_groups.hpp"
 
 void TestRFC9001A2() {
   std::vector<uint8_t> header = {
