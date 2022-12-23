@@ -24,8 +24,7 @@
       } KeyShareClientHello;
 */
 
-#ifndef TLS_KEY_SHARE_CLIENT_HELLO_HPP_
-#define TLS_KEY_SHARE_CLIENT_HELLO_HPP_
+#pragma once
 
 #include <vector>
 
@@ -45,5 +44,3 @@ private:
   std::vector<KeyShareEntry> client_shares_;
 };
 } // namespace tls
-
-#endif

@@ -3,13 +3,16 @@
 namespace tls {
 
 SupportedGroups::SupportedGroups() {
+  extension_type_ = ExtentionType::supported_groups;
 }
 
 std::vector<uint8_t> SupportedGroups::GetBinary() {
   std::vector<uint8_t> ret;
+
   // supported_groups(0x0010)
-  ret.push_back(0x00);
-  ret.push_back(0x0a);
+  ret.push_back(static_cast<uint16_t>(extension_type_) >> 4);
+  ret.push_back(static_cast<uint16_t>(extension_type_) & 0xff);
+
   // length
   ret.push_back(0x00);
   ret.push_back(0x04);
