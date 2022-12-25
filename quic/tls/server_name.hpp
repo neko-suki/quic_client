@@ -17,9 +17,7 @@ struct {
           ServerName server_name_list<1..2^16-1>
       } ServerNameList;
 */
-
-#ifndef TLS_SERVER_NAME_HPP_
-#define TLS_SERVER_NAME_HPP_
+#pragma once
 #include <vector>
 
 #include <stdint.h>
@@ -33,5 +31,3 @@ public:
   std::vector<uint8_t> GetBinary();
 };
 } // namespace tls
-
-#endif

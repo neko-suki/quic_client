@@ -37,6 +37,7 @@ https://www.rfc-editor.org/rfc/rfc8446.html#section-4.2
 namespace tls {
 
 enum class ExtentionType {
+  server_name = 0,
   supported_groups = 10,
   signature_algorithms = 13,
   supported_versions = 43,
