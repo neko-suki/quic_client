@@ -32,7 +32,7 @@ quic/tls/handshake.cpp
 quic/tls/hmac.cpp
 quic/tls/client_hello.cpp
 quic/tls/ecdh.cpp
-quic/tls/signature_algorithm.cpp
+quic/tls/signature_algorithms.cpp
 quic/tls/server_name.cpp
 quic/tls/server_hello.cpp
 quic/tls/quic_transport_parameter.cpp

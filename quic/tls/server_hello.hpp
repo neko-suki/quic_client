@@ -49,7 +49,6 @@ CIpherCuite
 #include "key_share_server_hello.hpp"
 #include "quic_transport_parameter.hpp"
 #include "server_name.hpp"
-#include "signature_algorithm.hpp"
 #include "supported_groups.hpp"
 #include "supported_versions.hpp"
 #include "tls_common.hpp"

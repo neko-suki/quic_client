@@ -56,8 +56,7 @@ Implementations of this specification MUST send this extension in the
         };
     } SupportedVersions;
 */
-#ifndef TLS_SIGNATURE_ALGORITHM_HPP_
-#define TLS_SIGNATURE_ALGORITHM_HPP_
+#pragma once
 #include <vector>
 
 #include <stdint.h>
@@ -65,11 +64,9 @@ Implementations of this specification MUST send this extension in the
 #include "extension.hpp"
 
 namespace tls {
-class SignatureAlgorithm : public Extension {
+class SignatureAlgorithms : public Extension {
 public:
-  SignatureAlgorithm();
+  SignatureAlgorithms();
   std::vector<uint8_t> GetBinary();
 };
 } // namespace tls
-
-#endif

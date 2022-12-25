@@ -60,7 +60,7 @@ void ClientHello::CreateClientHello(
   std::copy(extension.begin(), extension.end(),
             std::back_inserter(extensions));
 
-  extension = signature_algorithm_.GetBinary();
+  extension = signature_algorithms_.GetBinary();
   std::copy(extension.begin(), extension.end(),
             std::back_inserter(extensions));
 

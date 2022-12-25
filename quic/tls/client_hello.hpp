@@ -48,7 +48,7 @@ CIpherCuite
 #include "key_share_client_hello.hpp"
 #include "quic_transport_parameter.hpp"
 #include "server_name.hpp"
-#include "signature_algorithm.hpp"
+#include "signature_algorithms.hpp"
 #include "supported_groups.hpp"
 #include "supported_versions.hpp"
 #include "tls_common.hpp"
@@ -75,7 +75,7 @@ public:
   SupportedVersions supported_versions_;
   SupportedGroups supported_group_;
   KeyShareClientHello key_share_client_hello_;
-  SignatureAlgorithm signature_algorithm_;
+  SignatureAlgorithms signature_algorithms_;
   ServerName server_name_;
   ALPN alpn_;
   QUICTransportParameter quic_transport_parameter_;
