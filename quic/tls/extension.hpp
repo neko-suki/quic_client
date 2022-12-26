@@ -40,8 +40,10 @@ enum class ExtentionType {
   server_name = 0,
   supported_groups = 10,
   signature_algorithms = 13,
+  application_layer_protocol_negotiation = 16,
   supported_versions = 43,
   key_share_client_hello = 51,
+  quic_transport_parameter = 0x39
 };
 
 class Extension {

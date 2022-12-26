@@ -5,8 +5,7 @@ https://www.rfc-editor.org/rfc/rfc9001.html#section-8.2
    } ExtensionType;
 */
 
-#ifndef TLS_QUIC_TRANSPORT_PARAMETER_HPP_
-#define TLS_QUIC_TRANSPORT_PARAMETER_HPP_
+#pragma once
 #include <vector>
 
 #include <stdint.h>
@@ -17,6 +16,7 @@ https://www.rfc-editor.org/rfc/rfc9001.html#section-8.2
 namespace tls {
 class QUICTransportParameter : public Extension {
 public:
+  QUICTransportParameter();
   void SetInitialSourceConnectionID(
       std::vector<uint8_t> &initial_source_connection_id);
   std::vector<uint8_t> GetBinary();
@@ -25,5 +25,3 @@ private:
   std::vector<uint8_t> scid_;
 };
 } // namespace tls
-
-#endif

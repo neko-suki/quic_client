@@ -1,44 +1,36 @@
 #include "alpn.hpp"
 
+#include <iostream>
+
 namespace tls {
+ALPN::ALPN() {
+  extension_type_ = ExtentionType::application_layer_protocol_negotiation;
+}
+
 std::vector<uint8_t> ALPN::GetBinary() {
+  std::vector<uint8_t> ret;
+  // type: 0016 alpn
+  ret.push_back(static_cast<uint16_t>(extension_type_) >> 8);
+  ret.push_back(static_cast<uint16_t>(extension_type_) & 0xff);
+
   std::vector<std::string> protocol_name_list;
   protocol_name_list.push_back("h3");
 
-  std::vector<uint8_t> ret;
-  // type: 0016 alpn
-  ret.push_back(0x00);
-  ret.push_back(0x10);
-
   std::vector<uint8_t> buf;
-
   for (const auto &protocol_name : protocol_name_list) {
-    uint8_t protocol_name_length[1] = {
-        static_cast<uint8_t>(protocol_name.size() & 0xff)};
-    std::copy(protocol_name_length, protocol_name_length + 1,
-              std::back_inserter(buf));
+    buf.push_back(static_cast<uint8_t>(protocol_name.size() & 0xff));
     std::copy(protocol_name.begin(), protocol_name.end(),
               std::back_inserter(buf));
   }
 
-  uint8_t buf_length[2] = {
-      static_cast<uint8_t>((buf.size() & 0xff00) >> 8),
-      static_cast<uint8_t>(buf.size() & 0xff)};
+  std::vector<uint8_t> tmp;
+  tmp.push_back(static_cast<uint8_t>((buf.size() & 0xff00) >> 8));
+  tmp.push_back(static_cast<uint8_t>(buf.size() & 0xff));
+  std::copy(buf.begin(), buf.end(), std::back_inserter(tmp));
 
-  std::vector<uint8_t> extension;
-  for (int i = 0; i < 2; i++) {
-    extension.push_back(buf_length[i]);
-  }
-  std::copy(buf.begin(), buf.end(), std::back_inserter(extension));
-
-  uint8_t alpn_extentino_length[2] = {
-      static_cast<uint8_t>((extension.size() & 0xff00) >> 8),
-      static_cast<uint8_t>(extension.size() & 0xff)};
-
-  for (int i = 0; i < 2; i++) {
-    ret.push_back(alpn_extentino_length[i]);
-  }
-  std::copy(extension.begin(), extension.end(), std::back_inserter(ret));
+  ret.push_back(static_cast<uint8_t>((tmp.size() & 0xff00) >> 8));
+  ret.push_back(static_cast<uint8_t>(tmp.size() & 0xff));
+  std::copy(tmp.begin(), tmp.end(), std::back_inserter(ret));
 
   return ret;
 }

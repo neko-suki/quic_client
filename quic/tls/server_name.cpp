@@ -3,9 +3,7 @@
 #include "server_name.hpp"
 
 namespace tls {
-ServerName::ServerName() {
-  extension_type_ = ExtentionType::server_name;
-}
+ServerName::ServerName() { extension_type_ = ExtentionType::server_name; }
 
 std::vector<uint8_t> ServerName::GetBinary() {
   std::vector<uint8_t> ret;

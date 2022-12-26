@@ -15,9 +15,7 @@ https://www.rfc-editor.org/rfc/rfc6066#section-3
    } ProtocolNameList;
 
 */
-
-#ifndef TLS_ALPN_HPP_
-#define TLS_ALPN_HPP_
+#pragma once
 #include <string>
 #include <vector>
 
@@ -28,8 +26,7 @@ https://www.rfc-editor.org/rfc/rfc6066#section-3
 namespace tls {
 class ALPN : public Extension {
 public:
+  ALPN();
   std::vector<uint8_t> GetBinary();
 };
 } // namespace tls
-
-#endif

@@ -1,7 +1,7 @@
 #include "key_share_client_hello.hpp"
 
 namespace tls {
-KeyShareClientHello::KeyShareClientHello(){
+KeyShareClientHello::KeyShareClientHello() {
   extension_type_ = ExtentionType::key_share_client_hello;
 }
 
