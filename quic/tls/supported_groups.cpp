@@ -10,7 +10,7 @@ std::vector<uint8_t> SupportedGroups::GetBinary() {
   std::vector<uint8_t> ret;
 
   // supported_groups(0x0010)
-  ret.push_back(static_cast<uint16_t>(extension_type_) >> 4);
+  ret.push_back(static_cast<uint16_t>(extension_type_) >> 8);
   ret.push_back(static_cast<uint16_t>(extension_type_) & 0xff);
 
   // length
