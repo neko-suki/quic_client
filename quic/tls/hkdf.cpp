@@ -25,21 +25,20 @@ std::vector<uint8_t> HKDF::ExpandLabel(std::vector<uint8_t> &secret,
                                        std::string label_string,
                                        std::vector<uint8_t> &context,
                                        size_t key_length) {
-  std::unique_ptr<Botan::KDF> hkdf(
-      Botan::KDF::create(std::string("HKDF-Expand(HMAC(SHA-256))")));
   std::string label = {static_cast<char>((key_length & 0xff00) >> 8),
                        static_cast<char>((key_length & 0xff))};
   label_string = "tls13 " + label_string;
   label.push_back(label_string.size());
   label += label_string;
-
   label.push_back(context.size());
+
   std::copy(context.begin(), context.end(), std::back_inserter(label));
 
+  std::unique_ptr<Botan::KDF> hkdf(
+      Botan::KDF::create(std::string("HKDF-Expand(HMAC(SHA-256))")));
   Botan::secure_vector<uint8_t> key = hkdf->derive_key(
       key_length, secret.data(), secret.size(), "", label);
 
-  // copy secure_vector to vector
   std::vector<uint8_t> ret(key.begin(), key.end());
   return ret;
 }
@@ -56,4 +55,4 @@ std::vector<uint8_t> HKDF::DeriveSecret(size_t hash_length,
       ExpandLabel(secret, label, transcript_hash, hash_length);
   return ret;
 }
-} // namespace quic
+} // namespace tls

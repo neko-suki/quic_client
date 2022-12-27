@@ -1,5 +1,4 @@
-#ifndef QUIC_HKDF_HPP_
-#define QUIC_HKDF_HPP_
+#pragma once
 
 #include <iostream>
 
@@ -30,6 +29,4 @@ public:
                                     std::string label,
                                     std::vector<uint8_t> &message);
 };
-} // namespace quic
-
-#endif
+} // namespace tls
