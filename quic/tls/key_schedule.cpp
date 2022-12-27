@@ -13,7 +13,7 @@ void KeySchedule::ComputeHandshakeKey(
   // Derive-Secret(secret=early_secret., Label="derived", Message="")
   std::vector<uint8_t> empty_message;
   std::string label = "derived";
-  quic::HKDF hkdf;
+  HKDF hkdf;
   derived_secret_ =
       hkdf.DeriveSecret(hash_length, early_secret_, label, empty_message);
 
@@ -73,7 +73,7 @@ void KeySchedule::ComputeHandshakeKey(
 void KeySchedule::ComputeApplicationKey(
     size_t hash_length, std::vector<uint8_t> &handshake_hash) {
 
-  quic::HKDF hkdf;
+  HKDF hkdf;
 
   // derived secret
   std::vector<uint8_t> empty_message;
@@ -132,7 +132,7 @@ void KeySchedule::ComputeApplicationKey(
 std::vector<uint8_t> KeySchedule::ComputeEarlySecret(size_t hash_length) {
   std::vector<uint8_t> salt(hash_length, 0);
   std::vector<uint8_t> ikm(hash_length, 0);
-  quic::HKDF hkdf;
+  HKDF hkdf;
   std::vector<uint8_t> ret = hkdf.Extract(hash_length, salt, ikm);
 
   return ret;

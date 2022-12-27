@@ -1,6 +1,6 @@
 #include "hkdf.hpp"
 
-namespace quic {
+namespace tls {
 HKDF::HKDF() {}
 
 std::vector<uint8_t> HKDF::Extract(size_t hash_len,

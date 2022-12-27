@@ -12,7 +12,7 @@
 
 #include "../tls/hash.hpp"
 
-namespace quic {
+namespace tls {
 
 class HKDF {
 public:
