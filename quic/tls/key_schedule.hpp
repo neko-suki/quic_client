@@ -12,7 +12,7 @@
 //#include <openssl/ecdh.h>
 //#include <openssl/evp.h>
 
-#include "../quic/hkdf.hpp"
+#include "hkdf.hpp"
 #include "hash.hpp"
 
 namespace tls {

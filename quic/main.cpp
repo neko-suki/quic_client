@@ -25,7 +25,6 @@
 #include "quic/ack_manager.hpp"
 #include "quic/crypto_frame.hpp"
 #include "quic/handshake.hpp"
-#include "quic/hkdf.hpp"
 #include "quic/initial_secret_generator.hpp"
 #include "quic/one_rtt_packet.hpp"
 #include "quic/packet_number_manager.hpp"

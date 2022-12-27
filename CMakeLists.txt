@@ -29,6 +29,7 @@ quic/tls/key_share_client_hello.cpp
 quic/tls/key_share_server_hello.cpp
 quic/tls/hash.cpp
 quic/tls/handshake.cpp
+quic/tls/hkdf.cpp
 quic/tls/hmac.cpp
 quic/tls/client_hello.cpp
 quic/tls/ecdh.cpp
@@ -43,7 +44,6 @@ quic/quic/crypto_frame.cpp
 quic/quic/frame_parser.cpp
 quic/quic/handshake.cpp
 quic/quic/handshake_done_frame.cpp
-quic/quic/hkdf.cpp
 quic/quic/initial_packet.cpp
 quic/quic/initial_secret_generator.cpp
 quic/quic/one_rtt_packet.cpp
