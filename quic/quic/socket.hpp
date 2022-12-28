@@ -15,6 +15,7 @@ class Socket {
 public:
   Socket();
   void Send(std::vector<uint8_t> &packet);
+  ssize_t RecvFrom(uint8_t *buf, const size_t buf_size);
   int sock_;
 };
 } // namespace quic

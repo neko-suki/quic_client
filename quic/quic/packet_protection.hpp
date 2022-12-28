@@ -1,5 +1,4 @@
-#ifndef QUIC_PACKET_PROTECTION_HPP_
-#define QUIC_PACKET_PROTECTION_HPP_
+#pragma once
 
 #include <vector>
 
@@ -31,4 +30,3 @@ private:
                     const uint8_t key[], int packet_number_offset);
 };
 } // namespace quic
-#endif

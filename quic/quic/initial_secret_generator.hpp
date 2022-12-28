@@ -1,5 +1,4 @@
-#ifndef QUIC_INITIAL_SECRET_GENERATOR_HPP_
-#define QUIC_INITIAL_SECRET_GENERATOR_HPP_
+#pragma once
 
 #include <vector>
 
@@ -33,4 +32,3 @@ private:
 };
 
 } // namespace quic
-#endif // QUIC_INITIAL_SECRET_GENERATOR_HPP_

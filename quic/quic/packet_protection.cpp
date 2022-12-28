@@ -98,7 +98,7 @@ int PacketProtection::ProtectHeader(uint8_t header[], int header_sz,
                                     int protected_payload_sz,
                                     const uint8_t key[],
                                     int packet_number_offset) {
-  int header_type; // q
+  int header_type;
   int packet_number_length;
   unsigned char sample[16];
   int sample_sz = 16;
@@ -108,7 +108,9 @@ int PacketProtection::ProtectHeader(uint8_t header[], int header_sz,
   } else {
     header_type = SHORT_HEADER;
   }
+
   packet_number_length = (0x03 & header[0]) + 1;
+
   int sample_begin = 4 - packet_number_length;
   for (int i = 0; i < sample_sz; i++) {
     sample[i] = protected_payload[sample_begin + i];

@@ -47,21 +47,6 @@ void dump(std::vector<uint8_t> &data) {
   printf("\n");
 }
 
-ssize_t recvfrom(quic::Socket &sock, uint8_t *buf, const size_t buf_size) {
-  int port = 4433;
-
-  struct sockaddr_in servaddr;
-  servaddr.sin_family = AF_INET;
-  servaddr.sin_port = htons(port);
-  servaddr.sin_addr.s_addr = INADDR_ANY;
-
-  socklen_t addlen = sizeof(servaddr);
-  ssize_t read_len =
-      recvfrom(sock.sock_, reinterpret_cast<void *>(buf), buf_size, 0,
-               (struct sockaddr *)&servaddr, &addlen);
-  return read_len;
-}
-
 int main(int argc, char **argv) {
   /*
   check hkdf extract
@@ -130,7 +115,7 @@ int main(int argc, char **argv) {
   printf("========== Initial packet received ==========\n");
   uint8_t packet[2048];
   const size_t packet_size = 2048;
-  ssize_t read_size = recvfrom(sock, packet, packet_size);
+  ssize_t read_size = sock.RecvFrom(packet, packet_size);
 
   // parse initial packet
   quic::ParsePacket p;
@@ -322,7 +307,7 @@ int main(int argc, char **argv) {
 
   std::thread recv_thread([&] {
     while (true) {
-      read_size = recvfrom(sock, packet, packet_size);
+      read_size = sock.RecvFrom(packet, packet_size);
       quic::PacketType packet_type = quic::IsLongHeaderPacket(packet);
       if (quic::PacketType::Handshake == packet_type) {
         printf("========== Handshake Packet received ==========\n");

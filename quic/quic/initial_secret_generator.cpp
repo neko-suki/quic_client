@@ -14,7 +14,6 @@ void InitialSecretGenerator::GenerateKey(
 
   std::vector<uint8_t> context; // empty
   client_secret_ = hkdf.ExpandLabel(secret_, "client in", context, 32);
-
   server_secret_ = hkdf.ExpandLabel(secret_, "server in", context, 32);
 
   client_key_ = hkdf.ExpandLabel(client_secret_, "quic key", context, 16);
