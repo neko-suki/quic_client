@@ -19,7 +19,7 @@ void Socket::Send(std::vector<uint8_t> &packet) {
   servaddr.sin_port = htons(port);
   char dest_ip[] = "127.0.0.1";
   inet_pton(AF_INET, dest_ip, &servaddr.sin_addr.s_addr);
-  //servaddr.sin_addr.s_addr = INADDR_ANY;
+  // servaddr.sin_addr.s_addr = INADDR_ANY;
 
   sendto(sock_, (const unsigned char *)packet.data(), packet_sz,
          MSG_CONFIRM, (const struct sockaddr *)&servaddr,

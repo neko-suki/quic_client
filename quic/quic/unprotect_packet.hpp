@@ -1,6 +1,4 @@
-
-#ifndef QUIC_PARSE_PACKET_HPP_
-#define QUIC_PARSE_PACKET_HPP_
+#pragma once
 
 #include <vector>
 
@@ -13,6 +11,15 @@
 #include "parse_common.hpp"
 
 namespace quic {
+struct InternalPacketInfo {
+  int payload_offset;
+  int length;
+  uint64_t packet_number;
+  int payload_length;
+  int tag_offset;
+  std::vector<uint8_t> source_connection_id;
+};
+
 class UnprotectPacket {
 public:
   struct PacketInfo
@@ -23,7 +30,7 @@ public:
             std::vector<uint8_t> &decoded_payload,
             const std::vector<uint8_t> dcid = std::vector<uint8_t>());
 
-  struct PacketInfo
+  struct InternalPacketInfo
   UnprotectHeader(unsigned char packet[], int packet_sz,
                   const std::vector<uint8_t> &key,
                   const EVP_CIPHER *cipher_suite,
@@ -39,5 +46,3 @@ public:
                         uint64_t packet_number);
 };
 } // namespace quic
-
-#endif // QUIC_PARSE_PACKET_HPP_

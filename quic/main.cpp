@@ -20,7 +20,7 @@
 
 #include "quic/frame_parser.hpp"
 #include "quic/initial_packet.hpp"
-#include "quic/parse_packet.hpp"
+#include "quic/unprotect_packet.hpp"
 
 #include "quic/ack_manager.hpp"
 #include "quic/crypto_frame.hpp"
@@ -117,7 +117,7 @@ int main(int argc, char **argv) {
   const size_t packet_size = 2048;
   ssize_t read_size = sock.RecvFrom(packet, packet_size);
 
-  // parse initial packet
+  // unprotect initial packet
   quic::UnprotectPacket p;
   // server initial key
   std::vector<uint8_t> server_initial_hp_key =
@@ -126,9 +126,9 @@ int main(int argc, char **argv) {
       initial_secret_generator.server_iv();
   std::vector<uint8_t> server_initial_key =
       initial_secret_generator.server_key();
+
   std::vector<uint8_t> header;
   std::vector<uint8_t> decoded_payload;
-
   struct quic::PacketInfo packet_info = p.Unprotect(
       packet, packet_size, server_initial_hp_key, server_initial_iv,
       server_initial_key, header, decoded_payload);

@@ -1,4 +1,4 @@
-#include "parse_packet.hpp"
+#include "unprotect_packet.hpp"
 
 #include <iostream>
 
@@ -12,24 +12,6 @@
 #include "ssl_common.hpp"
 
 namespace quic {
-/*
-Handshake Packet {
-  Header Form (1) = 1,
-  Fixed Bit (1) = 1,
-  Long Packet Type (2) = 2,
-  Reserved Bits (2),
-  Packet Number Length (2),
-  Version (32),
-  Destination Connection ID Length (8),
-  Destination Connection ID (0..160),
-  Source Connection ID Length (8),
-  Source Connection ID (0..160),
-  Length (i),
-  Packet Number (8..32),
-  Packet Payload (8..),
-}
-*/
-
 struct PacketInfo UnprotectPacket::Unprotect(
     unsigned char *packet, int packet_sz,
     const std::vector<uint8_t> &hp_key, const std::vector<uint8_t> &iv,
@@ -40,19 +22,24 @@ struct PacketInfo UnprotectPacket::Unprotect(
   uint64_t packet_number;
   const EVP_CIPHER *cipher_suite = EVP_aes_128_ecb();
 
-  struct PacketInfo packet_info = UnprotectHeader(
+  struct InternalPacketInfo internal_packet_info = UnprotectHeader(
       packet, packet_sz, hp_key, cipher_suite, header, dcid);
-  decoded_payload.resize(packet_info.payload_length);
+  decoded_payload.resize(internal_packet_info.payload_length);
 
-  UnprotectPayload(header, packet + packet_info.payload_offset,
-                   packet_info.payload_length,
-                   packet + packet_info.tag_offset, decoded_payload.data(),
-                   iv, key, packet_info.packet_number);
+  UnprotectPayload(header, packet + internal_packet_info.payload_offset,
+                   internal_packet_info.payload_length,
+                   packet + internal_packet_info.tag_offset,
+                   decoded_payload.data(), iv, key,
+                   internal_packet_info.packet_number);
+
+  struct PacketInfo packet_info = {
+      internal_packet_info.packet_number, internal_packet_info.tag_offset,
+      internal_packet_info.source_connection_id};
 
   return packet_info;
 }
 
-struct PacketInfo UnprotectPacket::UnprotectHeader(
+struct InternalPacketInfo UnprotectPacket::UnprotectHeader(
     unsigned char packet[], int packet_sz, const std::vector<uint8_t> &key,
     const EVP_CIPHER *cipher_suite, std::vector<uint8_t> &header,
     std::vector<uint8_t> dcid) {
@@ -61,7 +48,7 @@ struct PacketInfo UnprotectPacket::UnprotectHeader(
   int pn_offset;
   unsigned long long length = 0;
   unsigned char sample[16];
-  struct PacketInfo ret;
+  struct InternalPacketInfo ret;
   if ((packet[0] & 0x80) != 0) {
     // Long Header
     header_type = LONG_HEADER;
@@ -181,12 +168,12 @@ struct PacketInfo UnprotectPacket::UnprotectHeader(
 }
 
 void UnprotectPacket::UnprotectPayload(std::vector<uint8_t> &header,
-                                   unsigned char *payload, int payload_sz,
-                                   unsigned char *tag,
-                                   unsigned char *original_payload,
-                                   const std::vector<uint8_t> &iv,
-                                   const std::vector<uint8_t> &key,
-                                   uint64_t packet_number) {
+                                       unsigned char *payload,
+                                       int payload_sz, unsigned char *tag,
+                                       unsigned char *original_payload,
+                                       const std::vector<uint8_t> &iv,
+                                       const std::vector<uint8_t> &key,
+                                       uint64_t packet_number) {
   int original_payload_sz;
   int tag_sz = AES_BLOCK_SIZE;
 

@@ -50,7 +50,7 @@ quic/quic/one_rtt_packet.cpp
 quic/quic/packet_number_manager.cpp
 quic/quic/packet_protection.cpp
 quic/quic/padding_frame.cpp
-quic/quic/parse_packet.cpp
+quic/quic/unprotect_packet.cpp
 quic/quic/parse_variable_length_integer.cpp
 quic/quic/socket.cpp
 quic/quic/stream_frame.cpp
