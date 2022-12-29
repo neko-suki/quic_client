@@ -118,7 +118,7 @@ int main(int argc, char **argv) {
   ssize_t read_size = sock.RecvFrom(packet, packet_size);
 
   // parse initial packet
-  quic::ParsePacket p;
+  quic::UnprotectPacket p;
   // server initial key
   std::vector<uint8_t> server_initial_hp_key =
       initial_secret_generator.server_hp_key();
@@ -129,11 +129,10 @@ int main(int argc, char **argv) {
   std::vector<uint8_t> header;
   std::vector<uint8_t> decoded_payload;
 
-  // struct quic::PacketInfo packet_info = p.UnprotectHeader(packet,
-  // packet_size, server_initial_hp_key, EVP_aes_128_ecb(), header);
   struct quic::PacketInfo packet_info = p.Unprotect(
       packet, packet_size, server_initial_hp_key, server_initial_iv,
       server_initial_key, header, decoded_payload);
+
   id_of_server =
       packet_info.source_connection_id; // updated to choosed id by server
 

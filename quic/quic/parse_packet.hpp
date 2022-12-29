@@ -13,7 +13,7 @@
 #include "parse_common.hpp"
 
 namespace quic {
-class ParsePacket {
+class UnprotectPacket {
 public:
   struct PacketInfo
   Unprotect(unsigned char *packet, int packet_sz,

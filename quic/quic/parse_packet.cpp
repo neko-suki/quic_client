@@ -30,7 +30,7 @@ Handshake Packet {
 }
 */
 
-struct PacketInfo ParsePacket::Unprotect(
+struct PacketInfo UnprotectPacket::Unprotect(
     unsigned char *packet, int packet_sz,
     const std::vector<uint8_t> &hp_key, const std::vector<uint8_t> &iv,
     const std::vector<uint8_t> &key, std::vector<uint8_t> &header,
@@ -52,7 +52,7 @@ struct PacketInfo ParsePacket::Unprotect(
   return packet_info;
 }
 
-struct PacketInfo ParsePacket::UnprotectHeader(
+struct PacketInfo UnprotectPacket::UnprotectHeader(
     unsigned char packet[], int packet_sz, const std::vector<uint8_t> &key,
     const EVP_CIPHER *cipher_suite, std::vector<uint8_t> &header,
     std::vector<uint8_t> dcid) {
@@ -180,7 +180,7 @@ struct PacketInfo ParsePacket::UnprotectHeader(
   return ret;
 }
 
-void ParsePacket::UnprotectPayload(std::vector<uint8_t> &header,
+void UnprotectPacket::UnprotectPayload(std::vector<uint8_t> &header,
                                    unsigned char *payload, int payload_sz,
                                    unsigned char *tag,
                                    unsigned char *original_payload,
