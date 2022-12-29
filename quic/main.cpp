@@ -112,7 +112,7 @@ int main(int argc, char **argv) {
   quic::Socket sock;
   sock.Send(initial_packet_binary);
 
-  printf("========== Initial packet received ==========\n");
+  printf("========== Initial packet receive ==========\n");
   uint8_t packet[2048];
   const size_t packet_size = 2048;
   ssize_t read_size = sock.RecvFrom(packet, packet_size);
