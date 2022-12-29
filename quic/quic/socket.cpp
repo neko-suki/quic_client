@@ -27,14 +27,13 @@ void Socket::Send(std::vector<uint8_t> &packet) {
 }
 
 ssize_t Socket::RecvFrom(uint8_t *buf, const size_t buf_size) {
-  int port = 4433;
-
+  const int port = 4433;
   struct sockaddr_in servaddr;
   servaddr.sin_family = AF_INET;
   servaddr.sin_port = htons(port);
   servaddr.sin_addr.s_addr = INADDR_ANY;
-
   socklen_t addlen = sizeof(servaddr);
+
   ssize_t read_len =
       recvfrom(sock_, reinterpret_cast<void *>(buf), buf_size, 0,
                (struct sockaddr *)&servaddr, &addlen);
