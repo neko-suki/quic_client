@@ -194,7 +194,7 @@ int main(int argc, char **argv) {
   std::vector<uint8_t> server_handshake_iv =
       key_schedule.GetServerHandshakeIV();
 
-  int ptr = packet_info.tag_offset + 16;
+  int ptr = packet_info.tag_offset + AES_BLOCK_SIZE;
   packet_info = p.Unprotect(packet + ptr, packet_size, server_handshake_hp,
                             server_handshake_iv, server_handshake_key,
                             header, decoded_payload);
