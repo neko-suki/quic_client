@@ -30,6 +30,7 @@ public:
             std::vector<uint8_t> &decoded_payload,
             const std::vector<uint8_t> dcid = std::vector<uint8_t>());
 
+private:
   struct InternalPacketInfo
   UnprotectHeader(unsigned char packet[], int packet_sz,
                   const std::vector<uint8_t> &key,

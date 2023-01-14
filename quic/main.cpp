@@ -195,6 +195,7 @@ int main(int argc, char **argv) {
       key_schedule.GetServerHandshakeIV();
 
   int ptr = packet_info.tag_offset + AES_BLOCK_SIZE;
+  header.clear();
   packet_info = p.Unprotect(packet + ptr, packet_size, server_handshake_hp,
                             server_handshake_iv, server_handshake_key,
                             header, decoded_payload);
@@ -310,6 +311,7 @@ int main(int argc, char **argv) {
       quic::PacketType packet_type = quic::IsLongHeaderPacket(packet);
       if (quic::PacketType::Handshake == packet_type) {
         printf("========== Handshake Packet received ==========\n");
+        header.clear();
         packet_info = p.Unprotect(
             packet, read_size, server_handshake_hp, server_handshake_iv,
             server_handshake_key, header, decoded_payload);
@@ -320,6 +322,7 @@ int main(int argc, char **argv) {
         printf("========== Parse Handshake Packet ACK end ==========\n");
       } else {
         printf("========== 1-RTT packet received ==========\n");
+        header.clear();
         packet_info = p.Unprotect(packet, read_size, server_app_hp,
                                   server_app_iv, server_app_key, header,
                                   decoded_payload, id_of_client);

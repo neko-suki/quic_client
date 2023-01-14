@@ -9,6 +9,7 @@
 #include <string.h>
 
 #include "parse_common.hpp"
+#include "parse_variable_length_integer.hpp"
 #include "ssl_common.hpp"
 
 namespace quic {
@@ -18,12 +19,10 @@ struct PacketInfo UnprotectPacket::Unprotect(
     const std::vector<uint8_t> &key, std::vector<uint8_t> &header,
     std::vector<uint8_t> &decoded_payload,
     const std::vector<uint8_t> dcid) {
-  int tag_sz = AES_BLOCK_SIZE;
-  uint64_t packet_number;
   const EVP_CIPHER *cipher_suite = EVP_aes_128_ecb();
-
   struct InternalPacketInfo internal_packet_info = UnprotectHeader(
       packet, packet_sz, hp_key, cipher_suite, header, dcid);
+
   decoded_payload.resize(internal_packet_info.payload_length);
 
   UnprotectPayload(header, packet + internal_packet_info.payload_offset,
@@ -43,11 +42,10 @@ struct InternalPacketInfo UnprotectPacket::UnprotectHeader(
     unsigned char packet[], int packet_sz, const std::vector<uint8_t> &key,
     const EVP_CIPHER *cipher_suite, std::vector<uint8_t> &header,
     std::vector<uint8_t> dcid) {
-  header.clear();
   int header_type;
   int pn_offset;
   unsigned long long length = 0;
-  unsigned char sample[16];
+
   struct InternalPacketInfo ret;
   if ((packet[0] & 0x80) != 0) {
     // Long Header
@@ -80,27 +78,7 @@ struct InternalPacketInfo UnprotectPacket::UnprotectHeader(
       std::exit(1);
     }
 
-    int msb_2bit = ((packet[p] & 0xc0)) >> 6;
-    if (msb_2bit == 0) {
-      // length = 1
-      length = packet[p] & 0x3f;
-      p++;
-    } else if (msb_2bit == 1) {
-      length = ((packet[p] & 0x3f) << 8) | (packet[p + 1]);
-      p += 2;
-    } else if (msb_2bit == 2) {
-      length = ((packet[p] & 0x3f) << 24) | (packet[p + 1] << 16) |
-               (packet[p + 2] << 8) | (packet[p + 3]);
-      p += 4;
-    } else if (msb_2bit == 3) {
-      length = ((unsigned long long)(packet[p] & 0x3f) << 56) |
-               ((unsigned long long)(packet[p + 1]) << 48) |
-               ((unsigned long long)(packet[p + 2]) << 40) |
-               (((unsigned long long)packet[p + 3]) << 32) |
-               ((packet[p + 4] & 0x3f) << 24) | (packet[p + 5] << 16) |
-               (packet[p + 6] << 8) | (packet[p + 7]);
-      p += 8;
-    }
+    length = parse_variable_length_integer(packet, p);
     pn_offset = p;
   } else {
     header_type = SHORT_HEADER;
@@ -109,10 +87,10 @@ struct InternalPacketInfo UnprotectPacket::UnprotectHeader(
     length = packet_sz - pn_offset;
   }
 
+  unsigned char sample[16];
   std::copy(packet + pn_offset + 4, packet + pn_offset + 4 + 16, sample);
 
   int mode = ENC;
-  int sample_length = sizeof(sample);
 
   // server can obtained the same key from packet.
   EVP_CIPHER_CTX *evp = NULL;
@@ -130,7 +108,8 @@ struct InternalPacketInfo UnprotectPacket::UnprotectHeader(
 
   unsigned char mask[16] = {0};
   int mask_length;
-  if (EVP_CipherUpdate(evp, mask, &mask_length, sample, sample_length) !=
+  int sample_length = sizeof(sample);
+  if (EVP_CipherUpdate(evp, mask, &mask_length, sample, sizeof(sample)) !=
       SSL_SUCCESS) {
     fprintf(stderr, "ERROR: header_protection EVP_CpiherUpdate\n");
     return ret;
@@ -138,8 +117,7 @@ struct InternalPacketInfo UnprotectPacket::UnprotectHeader(
 
   if (header_type == LONG_HEADER) {
     packet[0] ^= (mask[0] & 0x0f);
-    // printf("packet[0]: %02x\n", packet[0]);
-  } else { // Short Header
+  } else {
     packet[0] ^= (mask[0] & 0x1f);
   }
 
@@ -147,9 +125,9 @@ struct InternalPacketInfo UnprotectPacket::UnprotectHeader(
 
   unsigned long long packet_number = 0;
   for (int i = 0; i < packet_number_length; i++) {
-    packet_number =
-        (packet_number << 8) + (packet[pn_offset + i] ^ mask[i + 1]);
     packet[pn_offset + i] ^= mask[i + 1];
+    packet_number =
+        (packet_number << 8) + packet[pn_offset + i];
   }
 
   EVP_CIPHER_CTX_free(evp);
