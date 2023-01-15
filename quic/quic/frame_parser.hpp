@@ -1,5 +1,4 @@
-#ifndef QUIC_PARSE_FRAME_HPP_
-#define QUIC_PARSE_FRAME_HPP_
+#pragma once
 
 #include <memory>
 
@@ -19,5 +18,3 @@ public:
   ParseAll(std::vector<uint8_t> &buf);
 };
 } // namespace quic
-
-#endif // QUIC_PARSE_FRAME_HPP_

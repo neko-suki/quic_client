@@ -137,32 +137,25 @@ int main(int argc, char **argv) {
       packet_info.source_connection_id; // updated to choosed id by server
 
   int buf_pointer = 0;
-  bool initial_frame_received = false;
+  bool crypto_frame_received = false;
   bool ack_received = false;
-  // read frame
+
   quic::FrameParser frame_parser;
-  std::unique_ptr<quic::QUICFrame> initial_frame;
-  while (!initial_frame_received || !ack_received) {
-    std::unique_ptr<quic::QUICFrame> frame =
-        frame_parser.Parse(decoded_payload, buf_pointer);
-    switch (frame->frame_type_) {
-    case quic::QUICFrameType::ACK:
-      ack_received = true;
-      break;
-    case quic::QUICFrameType::CRYPTO:
-      initial_frame_received = true;
-      initial_frame = std::move(frame);
-      break;
-    default:
-      printf("invalid frame type\n");
-      std::exit(1);
+  std::vector<std::unique_ptr<quic::QUICFrame>> initial_packet_response =
+      frame_parser.ParseAll(decoded_payload);
+  std::unique_ptr<quic::QUICFrame> server_hello_crypto_frame;
+
+  for (int i = 0; i < initial_packet_response.size(); i++) {
+    if (initial_packet_response[i]->FrameType() ==
+        quic::QUICFrameType::CRYPTO) {
+      server_hello_crypto_frame = std::move(initial_packet_response[i]);
       break;
     }
   }
 
   // read crypto_frame
-  quic::CryptoFrame *crypto_frame =
-      reinterpret_cast<quic::CryptoFrame *>(initial_frame.get());
+  quic::CryptoFrame *crypto_frame = reinterpret_cast<quic::CryptoFrame *>(
+      server_hello_crypto_frame.get());
 
   // parse handshake packet
   std::vector<uint8_t> server_key = crypto_frame->GetSharedKey(0);

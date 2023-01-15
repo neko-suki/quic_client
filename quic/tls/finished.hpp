@@ -24,7 +24,6 @@ public:
   uint32_t hash_length_;
   std::vector<uint8_t> GetVerifyData() const;
 
-
 private:
   std::vector<uint8_t> verify_data_;
 };

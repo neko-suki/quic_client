@@ -67,7 +67,7 @@ public:
   std::vector<uint8_t> GetSharedKey();
   std::vector<uint8_t> GetServerHello();
   uint8_t GetMsgType();
-  const Finished& GetFinished();
+  const Finished &GetFinished();
 
 private:
   uint8_t msg_type_;

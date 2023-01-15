@@ -126,8 +126,7 @@ struct InternalPacketInfo UnprotectPacket::UnprotectHeader(
   unsigned long long packet_number = 0;
   for (int i = 0; i < packet_number_length; i++) {
     packet[pn_offset + i] ^= mask[i + 1];
-    packet_number =
-        (packet_number << 8) + packet[pn_offset + i];
+    packet_number = (packet_number << 8) + packet[pn_offset + i];
   }
 
   EVP_CIPHER_CTX_free(evp);
@@ -195,8 +194,8 @@ void UnprotectPacket::UnprotectPayload(std::vector<uint8_t> &header,
     return;
   }
 
-  int test = EVP_CipherFinal_ex(evp, original_payload + original_payload_sz,
-                                &original_payload_sz);
+  int test = EVP_CipherFinal_ex(
+      evp, original_payload + original_payload_sz, &original_payload_sz);
   if (test <= 0 && ERR_get_error() != 0) {
     fprintf(stderr,
             "ERROR: EVP_CipherFinal_ex failed. OpenSSL error: %s\n",

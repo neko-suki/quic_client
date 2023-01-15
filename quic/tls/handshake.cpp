@@ -48,11 +48,7 @@ std::vector<uint8_t> Handshake::GetServerHello() {
   return ret;
 }
 
-uint8_t Handshake::GetMsgType(){
-  return msg_type_;
-}
+uint8_t Handshake::GetMsgType() { return msg_type_; }
 
-const Finished& Handshake::GetFinished(){
-  return finished_;
-}
+const Finished &Handshake::GetFinished() { return finished_; }
 } // namespace tls

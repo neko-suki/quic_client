@@ -52,7 +52,7 @@ void CryptoFrame::Parse(std::vector<uint8_t> &buf, int &p) {
                 std::back_inserter(payload_without_finished_));
     } else {
       // finished
-      const tls::Finished & finished = handshake.GetFinished();
+      const tls::Finished &finished = handshake.GetFinished();
       server_sent_verified_ = finished.GetVerifyData();
     }
     handshake_.push_back(std::move(handshake));
@@ -60,8 +60,8 @@ void CryptoFrame::Parse(std::vector<uint8_t> &buf, int &p) {
 }
 
 std::vector<uint8_t> CryptoFrame::GetSharedKey(int index) {
-  for(auto msg : handshake_){
-    if (msg.GetMsgType() == 2){
+  for (auto msg : handshake_) {
+    if (msg.GetMsgType() == 2) {
       return msg.GetSharedKey();
     }
   }
