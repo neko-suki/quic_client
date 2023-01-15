@@ -136,10 +136,6 @@ int main(int argc, char **argv) {
   id_of_server =
       packet_info.source_connection_id; // updated to choosed id by server
 
-  int buf_pointer = 0;
-  bool crypto_frame_received = false;
-  bool ack_received = false;
-
   quic::FrameParser frame_parser;
   std::vector<std::unique_ptr<quic::QUICFrame>> initial_packet_response =
       frame_parser.ParseAll(decoded_payload);
@@ -193,7 +189,7 @@ int main(int argc, char **argv) {
                             server_handshake_iv, server_handshake_key,
                             header, decoded_payload);
 
-  buf_pointer = 0;
+  int buf_pointer = 0;
   std::unique_ptr<quic::QUICFrame> handshake_frame =
       frame_parser.Parse(decoded_payload, buf_pointer);
   quic::CryptoFrame *crypto_frame_handshake =
