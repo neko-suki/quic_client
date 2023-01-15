@@ -195,15 +195,7 @@ void UnprotectPacket::UnprotectPayload(std::vector<uint8_t> &header,
     return;
   }
 
-  int tmp_len = original_payload_sz;
-  unsigned char tmp_tag[AES_BLOCK_SIZE] = {0};
-  if (EVP_CIPHER_CTX_ctrl(evp, EVP_CTRL_AEAD_SET_TAG, tag_sz, tmp_tag) !=
-      SSL_SUCCESS) {
-    fprintf(stderr, "ERROR: EVP_CIPHER_CTX_ctrl(DEC)\n");
-    return;
-  }
-
-  int test = EVP_CipherFinal_ex(evp, original_payload + tmp_len,
+  int test = EVP_CipherFinal_ex(evp, original_payload + original_payload_sz,
                                 &original_payload_sz);
   if (test <= 0 && ERR_get_error() != 0) {
     fprintf(stderr,

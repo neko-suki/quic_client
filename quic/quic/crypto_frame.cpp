@@ -1,4 +1,5 @@
 #include "crypto_frame.hpp"
+#include "../tls/finished.hpp"
 #include "parse_variable_length_integer.hpp"
 #include "variable_length_integer.hpp"
 
@@ -46,20 +47,26 @@ void CryptoFrame::Parse(std::vector<uint8_t> &buf, int &p) {
     tls::Handshake handshake;
     handshake.Parse(buf, p);
 
-    if (handshake.msg_type_ != 20) {
+    if (handshake.GetMsgType() != 20) {
       std::copy(buf.begin() + p_begin, buf.begin() + p,
                 std::back_inserter(payload_without_finished_));
     } else {
       // finished
-      std::vector<uint8_t> finished = handshake.finished_.verify_data_;
-      server_sent_verified_ = finished;
+      const tls::Finished & finished = handshake.GetFinished();
+      server_sent_verified_ = finished.GetVerifyData();
     }
     handshake_.push_back(std::move(handshake));
   }
 }
 
 std::vector<uint8_t> CryptoFrame::GetSharedKey(int index) {
-  return handshake_[index].GetSharedKey();
+  for(auto msg : handshake_){
+    if (msg.GetMsgType() == 2){
+      return msg.GetSharedKey();
+    }
+  }
+  assert("ServerHello is not found in Initial packet response");
+  return handshake_[0].GetSharedKey();
 }
 
 // should be use handshake

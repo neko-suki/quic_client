@@ -8,4 +8,8 @@ void Finished::Parse(std::vector<uint8_t> &buf, int &p) {
             std::back_inserter(verify_data_));
   p += 32;
 }
+
+std::vector<uint8_t> Finished::GetVerifyData() const {
+  return verify_data_;
+}
 } // namespace tls
