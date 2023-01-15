@@ -3,23 +3,6 @@
 namespace tls {
 Handshake::Handshake()
     : msg_type_(static_cast<uint8_t>(HandshakeType::client_hello)) {}
-std::vector<uint8_t> Handshake::GetBinary() {
-  std::vector<uint8_t> ret;
-  // client hello
-  ret.push_back(msg_type_);
-
-  std::vector<uint8_t> handshake = client_hello_.GetBinary();
-  uint8_t length[3] = {
-      static_cast<uint8_t>((handshake.size() & 0xff0000) >> 16),
-      static_cast<uint8_t>((handshake.size() & 0x00ff00) >> 8),
-      static_cast<uint8_t>((handshake.size() & 0x0000ff))};
-  for (int i = 0; i < 3; i++) {
-    ret.push_back(length[i]);
-  }
-  std::copy(handshake.begin(), handshake.end(), std::back_inserter(ret));
-
-  return ret;
-}
 
 void Handshake::Parse(std::vector<uint8_t> &buf, int &p) {
   msg_type_ = buf[p++];
