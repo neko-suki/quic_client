@@ -1,5 +1,4 @@
-#ifndef QUIC_QUIC_FRAME_HPP_
-#define QUIC_QUIC_FRAME_HPP_
+#pragma once
 
 #include <stdint.h>
 
@@ -19,8 +18,7 @@ public:
   virtual std::vector<uint8_t> GetBinary() = 0;
   virtual void Parse(std::vector<uint8_t> &buf, int &p) = 0;
   QUICFrameType FrameType() { return frame_type_; }
+protected:
   QUICFrameType frame_type_;
 };
-
 } // namespace quic
-#endif

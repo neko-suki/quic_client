@@ -51,7 +51,6 @@ std::unique_ptr<QUICFrame> FrameParser::Parse(std::vector<uint8_t> &buf,
     ret = std::make_unique<StreamFrame>();
     printf("STREAM frame received\n");
     ret->Parse(buf, p);
-
     break;
   }
   case 0x18: {
