@@ -41,15 +41,16 @@ void CryptoFrame::Parse(std::vector<uint8_t> &buf, int &p) {
   uint64_t length = parse_variable_length_integer(buf, p);
   uint32_t buf_end = p + length;
   std::copy(buf.begin() + p, buf.begin() + buf_end,
-            std::back_inserter(payload_));
+            std::back_inserter(server_handshake_binary_));
   while (p < buf_end) {
     int p_begin = p;
     tls::Handshake handshake;
     handshake.Parse(buf, p);
 
     if (handshake.GetMsgType() != 20) {
-      std::copy(buf.begin() + p_begin, buf.begin() + p,
-                std::back_inserter(payload_without_finished_));
+      std::copy(
+          buf.begin() + p_begin, buf.begin() + p,
+          std::back_inserter(server_handshake_binary_without_finished_));
     } else {
       // finished
       const tls::Finished &finished = handshake.GetFinished();
@@ -80,10 +81,13 @@ std::vector<uint8_t> CryptoFrame::GetServerHello() {
   return handshake_[0].GetServerHello();
 }
 
-std::vector<uint8_t> CryptoFrame::GetPayload() { return payload_; }
+std::vector<uint8_t> CryptoFrame::GetServerHandshakeBinary() {
+  return server_handshake_binary_;
+}
 
-std::vector<uint8_t> CryptoFrame::GetPayloadWithoutFinished() {
-  return payload_without_finished_;
+std::vector<uint8_t>
+CryptoFrame::GetServerHandshakeBinaryWithoutFinished() {
+  return server_handshake_binary_without_finished_;
 }
 std::vector<uint8_t> CryptoFrame::ServerSentFinished() {
   return server_sent_verified_;

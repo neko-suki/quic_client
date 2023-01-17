@@ -29,15 +29,15 @@ public:
   tls::ECDH GetECDH();
   std::vector<uint8_t> GetClientHello();
   std::vector<uint8_t> GetServerHello();
-  std::vector<uint8_t> GetPayload();
-  std::vector<uint8_t> GetPayloadWithoutFinished();
+  std::vector<uint8_t> GetServerHandshakeBinary();
+  std::vector<uint8_t> GetServerHandshakeBinaryWithoutFinished();
   std::vector<uint8_t> ServerSentFinished();
 
 private:
   tls::ClientHello client_hello_;
   std::vector<tls::Handshake> handshake_;
-  std::vector<uint8_t> payload_;
-  std::vector<uint8_t> payload_without_finished_;
+  std::vector<uint8_t> server_handshake_binary_;
+  std::vector<uint8_t> server_handshake_binary_without_finished_;
   std::vector<uint8_t> server_sent_verified_;
   std::vector<uint8_t> crypto_frame_binary_;
 };

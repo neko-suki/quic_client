@@ -206,7 +206,7 @@ int main(int argc, char **argv) {
     std::copy(server_hello_bin.begin(), server_hello_bin.end(),
               std::back_inserter(merged_handshake));
     std::vector<uint8_t> handshake_server_hello =
-        crypto_frame_handshake->GetPayloadWithoutFinished();
+        crypto_frame_handshake->GetServerHandshakeBinaryWithoutFinished();
     std::copy(handshake_server_hello.begin(), handshake_server_hello.end(),
               std::back_inserter(merged_handshake));
 
@@ -243,7 +243,7 @@ int main(int argc, char **argv) {
   std::copy(server_hello_bin.begin(), server_hello_bin.end(),
             std::back_inserter(merged_handshake));
   std::vector<uint8_t> handshake_server_hello_to_server_fin =
-      crypto_frame_handshake->GetPayload();
+      crypto_frame_handshake->GetServerHandshakeBinary();
   std::copy(handshake_server_hello_to_server_fin.begin(),
             handshake_server_hello_to_server_fin.end(),
             std::back_inserter(merged_handshake));
