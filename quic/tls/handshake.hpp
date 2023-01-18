@@ -42,9 +42,7 @@ enum {
           Extension extensions<6..2^16-1>;
       } ServerHello;
 */
-
-#ifndef TLS_HANDSHAKE_HPP_
-#define TLS_HANDSHAKE_HPP_
+#pragma once
 
 #include <stdint.h>
 
@@ -81,4 +79,3 @@ private:
 };
 
 } // namespace tls
-#endif // TLS_HANDSHAKE_HPP_

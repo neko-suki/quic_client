@@ -65,8 +65,6 @@ public:
 
   uint8_t msg_type_;
   uint32_t length_; // 24 as real
-  ClientHello client_hello_;
-  ServerHello server_hello_;
 };
 
 } // namespace tls

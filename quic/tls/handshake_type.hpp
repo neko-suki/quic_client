@@ -42,9 +42,7 @@ enum {
           Extension extensions<6..2^16-1>;
       } ServerHello;
 */
-
-#ifndef TLS_HANDSHAKE_TYPE_HPP_
-#define TLS_HANDSHAKE_TYPE_HPP_
+#pragma once
 
 #include <stdint.h>
 
@@ -61,4 +59,3 @@ enum class HandshakeType {
 };
 
 }
-#endif // TLS_HANDSHAKE_TYPE_HPP_
