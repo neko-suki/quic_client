@@ -3,7 +3,7 @@
 namespace tls {
 void ServerHello::Parse(std::vector<uint8_t> &buf, int &p) {
   int p_begin = p;
-  msg_type_ = buf[p];
+  msg_type_ = static_cast<HandshakeType>(buf[p]);
   p++; // msg_type;
   p += 3;// skip length
 

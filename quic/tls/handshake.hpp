@@ -52,10 +52,8 @@ enum {
 #include "certificate_verify.hpp"
 #include "client_hello.hpp"
 #include "ecdh.hpp"
-#include "encrypted_extensions.hpp"
 #include "finished.hpp"
 #include "handshake_type.hpp"
-//#include "server_hello.hpp"
 
 namespace tls {
 
@@ -68,19 +66,17 @@ public:
   Handshake();
   void Parse(std::vector<uint8_t> &buf, int &p);
 
-//  std::vector<uint8_t> GetSharedKey();
-//  std::vector<uint8_t> GetServerHello();
-  uint8_t GetMsgType();
+  HandshakeType GetMsgType();
   const Finished &GetFinished();
 
 protected:
-  uint8_t msg_type_;
+  HandshakeType msg_type_;
 
 private:
   uint32_t length_; // 24 as real
   ClientHello client_hello_;
   //ServerHello server_hello_;
-  EncryptedExtensions encrypted_extensions_;
+  //EncryptedExtensions encrypted_extensions_;
   Certificate certificate_;
   CertificateVerify certificate_verify_;
   Finished finished_;

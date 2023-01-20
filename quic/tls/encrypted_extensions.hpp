@@ -50,18 +50,20 @@ enum {
 
 #include <stdint.h>
 
+#include "handshake.hpp"
 #include "handshake_type.hpp"
 
 
 namespace tls {
 
-class EncryptedExtensions {
+class EncryptedExtensions : public Handshake {
 public:
   EncryptedExtensions();
   std::vector<uint8_t> GetBinary();
   void Parse(std::vector<uint8_t> &buf, int &p);
 
-  uint8_t msg_type_;
+private:
+  HandshakeType msg_type_;
   uint32_t length_; // 24 as real
 };
 

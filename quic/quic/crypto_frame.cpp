@@ -1,5 +1,6 @@
 #include "crypto_frame.hpp"
 #include "../tls/finished.hpp"
+#include "../tls/handshake_type.hpp"
 #include "parse_variable_length_integer.hpp"
 #include "variable_length_integer.hpp"
 
@@ -46,13 +47,13 @@ void CryptoFrame::Parse(std::vector<uint8_t> &buf, int &p) {
     int p_begin = p;
     std::unique_ptr<tls::Handshake> handshake = tls::HandshakeParser(buf, p);
 
-    if (handshake->GetMsgType() == 2){
+    if (handshake->GetMsgType() == tls::HandshakeType::server_hello){
       // server hello
       server_hello_ = std::unique_ptr<tls::ServerHello>(reinterpret_cast<tls::ServerHello*>(handshake.get()));
       std::copy(
           buf.begin() + p_begin, buf.begin() + p,
           std::back_inserter(server_handshake_binary_without_finished_));
-    } else if (handshake->GetMsgType() != 20) {
+    } else if (handshake->GetMsgType() != tls::HandshakeType::finished) {
       std::copy(
           buf.begin() + p_begin, buf.begin() + p,
           std::back_inserter(server_handshake_binary_without_finished_));

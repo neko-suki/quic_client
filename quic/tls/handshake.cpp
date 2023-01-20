@@ -1,25 +1,27 @@
 #include "handshake.hpp"
 #include "server_hello.hpp"
+#include "encrypted_extensions.hpp"
 
 namespace tls {
 
 std::unique_ptr<Handshake> HandshakeParser(std::vector<uint8_t> &buf, int &p){
   std::unique_ptr<Handshake> ret;
-  uint8_t msg_type_ = buf[p];
-  if (msg_type_ == 2) {
+  HandshakeType msg_type_ = static_cast<HandshakeType>(buf[p]);
+  if (msg_type_ == HandshakeType::server_hello) {
     std::unique_ptr<ServerHello> server_hello_ptr = std::make_unique<ServerHello>();
     server_hello_ptr->Parse(buf, p);
     ret = std::unique_ptr<Handshake>(dynamic_cast<Handshake*>(server_hello_ptr.release()));
-  } else if (msg_type_ == 8) {
+  } else if (msg_type_ == HandshakeType::encrypted_extensions) {
+    std::unique_ptr<EncryptedExtensions> encrypted_extensions_ptr = std::make_unique<EncryptedExtensions>();
+    encrypted_extensions_ptr->Parse(buf, p);
+    ret = std::unique_ptr<Handshake>(dynamic_cast<Handshake*>(encrypted_extensions_ptr.release()));
+  } else if (msg_type_ == HandshakeType::certificate) {
     ret = std::make_unique<Handshake>();
     ret->Parse(buf, p);
-  } else if (msg_type_ == 11) {
+  } else if (msg_type_ == HandshakeType::certificate_verify) {
     ret = std::make_unique<Handshake>();
     ret->Parse(buf, p);
-  } else if (msg_type_ == 15) {
-    ret = std::make_unique<Handshake>();
-    ret->Parse(buf, p);
-  } else if (msg_type_ == 20) {
+  } else if (msg_type_ == HandshakeType::finished) {
     ret = std::make_unique<Handshake>();
     ret->Parse(buf, p);
   } else {
@@ -30,19 +32,19 @@ std::unique_ptr<Handshake> HandshakeParser(std::vector<uint8_t> &buf, int &p){
 }
 
 Handshake::Handshake()
-    : msg_type_(static_cast<uint8_t>(HandshakeType::client_hello)) {}
+    : msg_type_(HandshakeType::client_hello) {}
 
 void Handshake::Parse(std::vector<uint8_t> &buf, int &p) {
-  msg_type_ = buf[p++];
+  msg_type_ = static_cast<HandshakeType>(buf[p++]);
   length_ = buf[p] << 16 | buf[p + 1] << 8 | buf[p + 2];
   p += 3;
-  if (msg_type_ == 8) {
-    encrypted_extensions_.Parse(buf, p);
-  } else if (msg_type_ == 11) {
+  //if (msg_type_ == HandshakeType::encrypted_extensions) {
+    //encrypted_extensions_.Parse(buf, p);
+  if (msg_type_ == HandshakeType::certificate) {
     certificate_.Parse(buf, p);
-  } else if (msg_type_ == 15) {
+  } else if (msg_type_ == HandshakeType::certificate_verify) {
     certificate_verify_.Parse(buf, p);
-  } else if (msg_type_ == 20) {
+  } else if (msg_type_ == HandshakeType::finished) {
     finished_.Parse(buf, p);
   } else {
     printf("not implemented\n");
@@ -76,7 +78,7 @@ std::vector<uint8_t> Handshake::GetServerHello() {
 }
 */
 
-uint8_t Handshake::GetMsgType() { return msg_type_; }
+HandshakeType Handshake::GetMsgType() { return msg_type_; }
 
 const Finished &Handshake::GetFinished() { return finished_; }
 } // namespace tls
