@@ -57,10 +57,7 @@
 
 #include <stdint.h>
 
-#include "client_hello.hpp"
-#include "ecdh.hpp"
 #include "handshake_type.hpp"
-#include "server_hello.hpp"
 
 namespace tls {
 

@@ -44,6 +44,8 @@ enum {
 */
 #pragma once
 
+#include <memory>
+
 #include <stdint.h>
 
 #include "certificate.hpp"
@@ -53,29 +55,34 @@ enum {
 #include "encrypted_extensions.hpp"
 #include "finished.hpp"
 #include "handshake_type.hpp"
-#include "server_hello.hpp"
+//#include "server_hello.hpp"
 
 namespace tls {
+
+class Handshake;
+
+std::unique_ptr<Handshake> HandshakeParser(std::vector<uint8_t> &buf, int &p);
 
 class Handshake {
 public:
   Handshake();
   void Parse(std::vector<uint8_t> &buf, int &p);
 
-  std::vector<uint8_t> GetSharedKey();
-  std::vector<uint8_t> GetServerHello();
+//  std::vector<uint8_t> GetSharedKey();
+//  std::vector<uint8_t> GetServerHello();
   uint8_t GetMsgType();
   const Finished &GetFinished();
 
-private:
+protected:
   uint8_t msg_type_;
+
+private:
   uint32_t length_; // 24 as real
   ClientHello client_hello_;
-  ServerHello server_hello_;
+  //ServerHello server_hello_;
   EncryptedExtensions encrypted_extensions_;
   Certificate certificate_;
   CertificateVerify certificate_verify_;
   Finished finished_;
 };
-
 } // namespace tls

@@ -1,5 +1,7 @@
 #include "certificate.hpp"
 
+#include <cstdio>
+
 namespace tls {
 
 CertificateEntry::CertificateEntry() {}

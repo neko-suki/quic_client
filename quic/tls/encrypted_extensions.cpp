@@ -1,5 +1,7 @@
 #include "encrypted_extensions.hpp"
 
+#include <cstdio>
+
 namespace tls {
 EncryptedExtensions::EncryptedExtensions()
     : msg_type_(

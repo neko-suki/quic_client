@@ -46,6 +46,7 @@ CIpherCuite
 #include "alpn.hpp"
 #include "ecdh.hpp"
 #include "extension.hpp"
+#include "handshake.hpp"
 #include "key_share_server_hello.hpp"
 #include "quic_transport_parameter.hpp"
 #include "server_name.hpp"
@@ -55,7 +56,7 @@ CIpherCuite
 
 namespace tls {
 
-class ServerHello {
+class ServerHello : public Handshake {
 public:
   void Parse(std::vector<uint8_t> &buf, int &p);
   std::vector<uint8_t> GetSharedKey();

@@ -44,30 +44,30 @@ void CryptoFrame::Parse(std::vector<uint8_t> &buf, int &p) {
             std::back_inserter(server_handshake_binary_));
   while (p < buf_end) {
     int p_begin = p;
-    tls::Handshake handshake;
-    handshake.Parse(buf, p);
+    std::unique_ptr<tls::Handshake> handshake = tls::HandshakeParser(buf, p);
 
-    if (handshake.GetMsgType() != 20) {
+    if (handshake->GetMsgType() == 2){
+      // server hello
+      server_hello_ = std::unique_ptr<tls::ServerHello>(reinterpret_cast<tls::ServerHello*>(handshake.get()));
       std::copy(
           buf.begin() + p_begin, buf.begin() + p,
           std::back_inserter(server_handshake_binary_without_finished_));
+    } else if (handshake->GetMsgType() != 20) {
+      std::copy(
+          buf.begin() + p_begin, buf.begin() + p,
+          std::back_inserter(server_handshake_binary_without_finished_));
+      handshake_.push_back(std::move(handshake));
     } else {
       // finished
-      const tls::Finished &finished = handshake.GetFinished();
+      const tls::Finished &finished = handshake->GetFinished();
       server_sent_verified_ = finished.GetVerifyData();
+      handshake_.push_back(std::move(handshake));
     }
-    handshake_.push_back(std::move(handshake));
   }
 }
 
 std::vector<uint8_t> CryptoFrame::GetSharedKey(int index) {
-  for (auto msg : handshake_) {
-    if (msg.GetMsgType() == 2) {
-      return msg.GetSharedKey();
-    }
-  }
-  assert("ServerHello is not found in Initial packet response");
-  return handshake_[0].GetSharedKey();
+  return server_hello_->GetSharedKey();
 }
 
 // should be use handshake
@@ -78,7 +78,7 @@ std::vector<uint8_t> CryptoFrame::GetClientHello() {
 }
 
 std::vector<uint8_t> CryptoFrame::GetServerHello() {
-  return handshake_[0].GetServerHello();
+  return server_hello_->GetServerHello();
 }
 
 std::vector<uint8_t> CryptoFrame::GetServerHandshakeBinary() {

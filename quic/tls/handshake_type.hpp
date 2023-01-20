@@ -46,10 +46,6 @@ enum {
 
 #include <stdint.h>
 
-#include "client_hello.hpp"
-#include "ecdh.hpp"
-#include "server_hello.hpp"
-
 namespace tls {
 
 enum class HandshakeType {
