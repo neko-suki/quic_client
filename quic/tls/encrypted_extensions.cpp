@@ -3,10 +3,6 @@
 #include <cstdio>
 
 namespace tls {
-EncryptedExtensions::EncryptedExtensions()
-    : msg_type_(
-          HandshakeType::encrypted_extensions) {}
-
 std::vector<uint8_t> EncryptedExtensions::GetBinary() {
   return {};
 }

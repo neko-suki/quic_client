@@ -48,7 +48,6 @@ enum {
 
 #include <stdint.h>
 
-#include "certificate.hpp"
 #include "certificate_verify.hpp"
 #include "client_hello.hpp"
 #include "ecdh.hpp"
@@ -77,7 +76,7 @@ private:
   ClientHello client_hello_;
   //ServerHello server_hello_;
   //EncryptedExtensions encrypted_extensions_;
-  Certificate certificate_;
+  //Certificate certificate_;
   CertificateVerify certificate_verify_;
   Finished finished_;
 };

@@ -1,7 +1,5 @@
 #include "certificate.hpp"
 
-#include <cstdio>
-
 namespace tls {
 
 CertificateEntry::CertificateEntry() {}
@@ -52,9 +50,11 @@ void CertificateEntry::Parse(std::vector<uint8_t> &buf, int &p) {
   }
 }
 
-Certificate::Certificate() {}
-
 void Certificate::Parse(std::vector<uint8_t> &buf, int &p) {
+  msg_type_ = static_cast<HandshakeType>(buf[p]);
+  p++; // msg_type;
+  p += 3;// skip length
+
   uint8_t certificate_request_context_length = buf[p];
   p++;
   p += certificate_request_context_length;

@@ -30,6 +30,7 @@
 
 #include <stdint.h>
 
+#include "handshake.hpp"
 #include "handshake_type.hpp"
 
 namespace tls {
@@ -42,9 +43,8 @@ public:
   std::vector<uint8_t> cert_data_;
 };
 
-class Certificate {
+class Certificate : public Handshake {
 public:
-  Certificate();
   void Parse(std::vector<uint8_t> &buf, int &p);
   CertificateEntry certificate_entry_;
 };

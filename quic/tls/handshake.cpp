@@ -1,3 +1,4 @@
+#include "certificate.hpp"
 #include "handshake.hpp"
 #include "server_hello.hpp"
 #include "encrypted_extensions.hpp"
@@ -16,8 +17,9 @@ std::unique_ptr<Handshake> HandshakeParser(std::vector<uint8_t> &buf, int &p){
     encrypted_extensions_ptr->Parse(buf, p);
     ret = std::unique_ptr<Handshake>(dynamic_cast<Handshake*>(encrypted_extensions_ptr.release()));
   } else if (msg_type_ == HandshakeType::certificate) {
-    ret = std::make_unique<Handshake>();
-    ret->Parse(buf, p);
+    std::unique_ptr<Certificate> encrypted_extensions_ptr = std::make_unique<Certificate>();
+    encrypted_extensions_ptr->Parse(buf, p);
+    ret = std::unique_ptr<Certificate>(dynamic_cast<Certificate*>(encrypted_extensions_ptr.release()));
   } else if (msg_type_ == HandshakeType::certificate_verify) {
     ret = std::make_unique<Handshake>();
     ret->Parse(buf, p);
@@ -38,11 +40,7 @@ void Handshake::Parse(std::vector<uint8_t> &buf, int &p) {
   msg_type_ = static_cast<HandshakeType>(buf[p++]);
   length_ = buf[p] << 16 | buf[p + 1] << 8 | buf[p + 2];
   p += 3;
-  //if (msg_type_ == HandshakeType::encrypted_extensions) {
-    //encrypted_extensions_.Parse(buf, p);
-  if (msg_type_ == HandshakeType::certificate) {
-    certificate_.Parse(buf, p);
-  } else if (msg_type_ == HandshakeType::certificate_verify) {
+  if (msg_type_ == HandshakeType::certificate_verify) {
     certificate_verify_.Parse(buf, p);
   } else if (msg_type_ == HandshakeType::finished) {
     finished_.Parse(buf, p);
