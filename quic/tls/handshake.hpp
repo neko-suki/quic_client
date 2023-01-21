@@ -57,7 +57,8 @@ namespace tls {
 
 class Handshake;
 
-std::unique_ptr<Handshake> HandshakeParser(std::vector<uint8_t> &buf, int &p);
+std::unique_ptr<Handshake> HandshakeParser(std::vector<uint8_t> &buf,
+                                           int &p);
 
 class Handshake {
 public:
@@ -65,7 +66,7 @@ public:
   void Parse(std::vector<uint8_t> &buf, int &p);
 
   HandshakeType GetMsgType();
-  //const Finished &GetFinished();
+  // const Finished &GetFinished();
 
 protected:
   HandshakeType msg_type_;
@@ -73,10 +74,10 @@ protected:
 private:
   uint32_t length_; // 24 as real
   ClientHello client_hello_;
-  //ServerHello server_hello_;
-  //EncryptedExtensions encrypted_extensions_;
-  //Certificate certificate_;
-  //CertificateVerify certificate_verify_;
-  //Finished finished_;
+  // ServerHello server_hello_;
+  // EncryptedExtensions encrypted_extensions_;
+  // Certificate certificate_;
+  // CertificateVerify certificate_verify_;
+  // Finished finished_;
 };
 } // namespace tls

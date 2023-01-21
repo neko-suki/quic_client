@@ -6,8 +6,8 @@ CertificateVerify::CertificateVerify() {}
 
 void CertificateVerify::Parse(std::vector<uint8_t> &buf, int &p) {
   msg_type_ = static_cast<HandshakeType>(buf[p]);
-  p++; // msg_type;
-  p += 3;// skip length
+  p++;    // msg_type;
+  p += 3; // skip length
   uint16_t status_scheme = (buf[p] << 8) | buf[p + 1];
   p += 2;
   uint16_t length = (buf[p] << 8) | buf[p + 1];

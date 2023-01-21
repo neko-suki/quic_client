@@ -45,48 +45,54 @@ void CryptoFrame::Parse(std::vector<uint8_t> &buf, int &p) {
             std::back_inserter(server_handshake_binary_));
   while (p < buf_end) {
     int p_begin = p;
-    std::unique_ptr<tls::Handshake> handshake = tls::HandshakeParser(buf, p);
+    std::unique_ptr<tls::Handshake> handshake =
+        tls::HandshakeParser(buf, p);
 
-    if (handshake->GetMsgType() == tls::HandshakeType::finished){
+    if (handshake->GetMsgType() == tls::HandshakeType::finished) {
       // finished
 
-    } else  {
-
+    } else {
     }
 
-    switch(handshake->GetMsgType()){
-      case tls::HandshakeType::server_hello:
-        server_hello_ = std::unique_ptr<tls::ServerHello>(reinterpret_cast<tls::ServerHello*>(handshake.release()));
-        std::copy(
+    switch (handshake->GetMsgType()) {
+    case tls::HandshakeType::server_hello:
+      server_hello_ = std::unique_ptr<tls::ServerHello>(
+          reinterpret_cast<tls::ServerHello *>(handshake.release()));
+      std::copy(
           buf.begin() + p_begin, buf.begin() + p,
           std::back_inserter(server_handshake_binary_without_finished_));
-        break;
-      case tls::HandshakeType::encrypted_extensions:
-        encrypted_extensions_ = std::unique_ptr<tls::EncryptedExtensions>(reinterpret_cast<tls::EncryptedExtensions*>(handshake.release()));
-        std::copy(
+      break;
+    case tls::HandshakeType::encrypted_extensions:
+      encrypted_extensions_ = std::unique_ptr<tls::EncryptedExtensions>(
+          reinterpret_cast<tls::EncryptedExtensions *>(
+              handshake.release()));
+      std::copy(
           buf.begin() + p_begin, buf.begin() + p,
           std::back_inserter(server_handshake_binary_without_finished_));
-        break;
-      case tls::HandshakeType::certificate:
-        certificate_ = std::unique_ptr<tls::Certificate>(reinterpret_cast<tls::Certificate*>(handshake.release()));
-        std::copy(
+      break;
+    case tls::HandshakeType::certificate:
+      certificate_ = std::unique_ptr<tls::Certificate>(
+          reinterpret_cast<tls::Certificate *>(handshake.release()));
+      std::copy(
           buf.begin() + p_begin, buf.begin() + p,
           std::back_inserter(server_handshake_binary_without_finished_));
-        break;
-      case tls::HandshakeType::certificate_verify:
-        certificate_verify_ = std::unique_ptr<tls::CertificateVerify>(reinterpret_cast<tls::CertificateVerify*>(handshake.release()));
-        std::copy(
+      break;
+    case tls::HandshakeType::certificate_verify:
+      certificate_verify_ = std::unique_ptr<tls::CertificateVerify>(
+          reinterpret_cast<tls::CertificateVerify *>(handshake.release()));
+      std::copy(
           buf.begin() + p_begin, buf.begin() + p,
           std::back_inserter(server_handshake_binary_without_finished_));
-        break;
-      case tls::HandshakeType::finished:
-        finished_ = std::unique_ptr<tls::Finished>(reinterpret_cast<tls::Finished*>(handshake.release()));
-        server_sent_verified_ = finished_->GetVerifyData();
-        break;
-      default:
-        printf("Unknown msg_type\n");
-        std::exit(1);
-        break;
+      break;
+    case tls::HandshakeType::finished:
+      finished_ = std::unique_ptr<tls::Finished>(
+          reinterpret_cast<tls::Finished *>(handshake.release()));
+      server_sent_verified_ = finished_->GetVerifyData();
+      break;
+    default:
+      printf("Unknown msg_type\n");
+      std::exit(1);
+      break;
     }
   }
 }

@@ -52,8 +52,8 @@ void CertificateEntry::Parse(std::vector<uint8_t> &buf, int &p) {
 
 void Certificate::Parse(std::vector<uint8_t> &buf, int &p) {
   msg_type_ = static_cast<HandshakeType>(buf[p]);
-  p++; // msg_type;
-  p += 3;// skip length
+  p++;    // msg_type;
+  p += 3; // skip length
 
   uint8_t certificate_request_context_length = buf[p];
   p++;

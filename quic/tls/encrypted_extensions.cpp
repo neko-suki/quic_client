@@ -3,9 +3,7 @@
 #include <cstdio>
 
 namespace tls {
-std::vector<uint8_t> EncryptedExtensions::GetBinary() {
-  return {};
-}
+std::vector<uint8_t> EncryptedExtensions::GetBinary() { return {}; }
 
 void EncryptedExtensions::Parse(std::vector<uint8_t> &buf, int &p) {
   /*
@@ -15,8 +13,8 @@ void EncryptedExtensions::Parse(std::vector<uint8_t> &buf, int &p) {
   */
   int p_begin = p;
   msg_type_ = static_cast<HandshakeType>(buf[p]);
-  p++; // msg_type;
-  p += 3;// skip length
+  p++;    // msg_type;
+  p += 3; // skip length
 
   uint32_t encrypted_extension_length = (buf[p] << 8) | (buf[p + 1]);
   p += 2;

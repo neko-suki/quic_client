@@ -53,7 +53,6 @@ enum {
 #include "handshake.hpp"
 #include "handshake_type.hpp"
 
-
 namespace tls {
 
 class EncryptedExtensions : public Handshake {

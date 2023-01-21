@@ -4,8 +4,8 @@ namespace tls {
 void ServerHello::Parse(std::vector<uint8_t> &buf, int &p) {
   int p_begin = p;
   msg_type_ = static_cast<HandshakeType>(buf[p]);
-  p++; // msg_type;
-  p += 3;// skip length
+  p++;    // msg_type;
+  p += 3; // skip length
 
   legacy_version_ = buf[p] << 8 | buf[p + 1];
   p += 2;
