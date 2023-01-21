@@ -49,7 +49,7 @@ void CryptoFrame::Parse(std::vector<uint8_t> &buf, int &p) {
 
     if (handshake->GetMsgType() == tls::HandshakeType::server_hello){
       // server hello
-      server_hello_ = std::unique_ptr<tls::ServerHello>(reinterpret_cast<tls::ServerHello*>(handshake.get()));
+      server_hello_ = std::unique_ptr<tls::ServerHello>(reinterpret_cast<tls::ServerHello*>(handshake.release()));
       std::copy(
           buf.begin() + p_begin, buf.begin() + p,
           std::back_inserter(server_handshake_binary_without_finished_));
@@ -60,8 +60,8 @@ void CryptoFrame::Parse(std::vector<uint8_t> &buf, int &p) {
       handshake_.push_back(std::move(handshake));
     } else {
       // finished
-      const tls::Finished &finished = handshake->GetFinished();
-      server_sent_verified_ = finished.GetVerifyData();
+      finished_ = std::unique_ptr<tls::Finished>(reinterpret_cast<tls::Finished*>(handshake.release()));
+      server_sent_verified_ = finished_->GetVerifyData();
       handshake_.push_back(std::move(handshake));
     }
   }

@@ -50,7 +50,7 @@ enum {
 
 #include "client_hello.hpp"
 #include "ecdh.hpp"
-#include "finished.hpp"
+
 #include "handshake_type.hpp"
 
 namespace tls {
@@ -65,7 +65,7 @@ public:
   void Parse(std::vector<uint8_t> &buf, int &p);
 
   HandshakeType GetMsgType();
-  const Finished &GetFinished();
+  //const Finished &GetFinished();
 
 protected:
   HandshakeType msg_type_;
@@ -77,6 +77,6 @@ private:
   //EncryptedExtensions encrypted_extensions_;
   //Certificate certificate_;
   //CertificateVerify certificate_verify_;
-  Finished finished_;
+  //Finished finished_;
 };
 } // namespace tls

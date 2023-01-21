@@ -1,5 +1,6 @@
 #include "certificate.hpp"
 #include "certificate_verify.hpp"
+#include "finished.hpp"
 #include "handshake.hpp"
 #include "server_hello.hpp"
 #include "encrypted_extensions.hpp"
@@ -26,8 +27,9 @@ std::unique_ptr<Handshake> HandshakeParser(std::vector<uint8_t> &buf, int &p){
     certificate_verify_ptr->Parse(buf, p);
     ret = std::unique_ptr<Handshake>(dynamic_cast<CertificateVerify*>(certificate_verify_ptr.release()));
   } else if (msg_type_ == HandshakeType::finished) {
-    ret = std::make_unique<Handshake>();
-    ret->Parse(buf, p);
+    std::unique_ptr<Finished> finished_ptr = std::make_unique<Finished>();
+    finished_ptr->Parse(buf, p);
+    ret = std::unique_ptr<Handshake>(dynamic_cast<Finished*>(finished_ptr.release()));
   } else {
     printf("not implemented\n");
     std::exit(1);
@@ -42,13 +44,9 @@ void Handshake::Parse(std::vector<uint8_t> &buf, int &p) {
   msg_type_ = static_cast<HandshakeType>(buf[p++]);
   length_ = buf[p] << 16 | buf[p + 1] << 8 | buf[p + 2];
   p += 3;
-  if (msg_type_ == HandshakeType::finished) {
-    finished_.Parse(buf, p);
-  } else {
-    printf("not implemented\n");
-    p += length_;
-    std::exit(1);
-  }
+  printf("not implemented\n");
+  p += length_;
+  std::exit(1);
 }
 
 /*
@@ -78,5 +76,5 @@ std::vector<uint8_t> Handshake::GetServerHello() {
 
 HandshakeType Handshake::GetMsgType() { return msg_type_; }
 
-const Finished &Handshake::GetFinished() { return finished_; }
+//const Finished &Handshake::GetFinished() { return finished_; }
 } // namespace tls

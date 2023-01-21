@@ -11,9 +11,11 @@
 
 #include <stdint.h>
 
+#include "handshake.hpp"
+
 namespace tls {
 
-class Finished {
+class Finished : public Handshake {
 public:
   void Parse(std::vector<uint8_t> &buf, int &p);
   uint32_t hash_length_;
