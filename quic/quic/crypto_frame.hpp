@@ -13,6 +13,9 @@
 #include <vector>
 
 #include "../tls/client_hello.hpp"
+#include "../tls/certificate.hpp"
+#include "../tls/certificate_verify.hpp"
+#include "../tls/encrypted_extensions.hpp"
 #include "../tls/finished.hpp"
 #include "../tls/server_hello.hpp"
 #include "../tls/handshake.hpp"
@@ -37,8 +40,10 @@ public:
 
 private:
   tls::ClientHello client_hello_;
-  std::vector<std::unique_ptr<tls::Handshake>> handshake_;
   std::unique_ptr<tls::ServerHello> server_hello_;
+  std::unique_ptr<tls::EncryptedExtensions> encrypted_extensions_;
+  std::unique_ptr<tls::Certificate> certificate_;
+  std::unique_ptr<tls::CertificateVerify> certificate_verify_;
   std::unique_ptr<tls::Finished> finished_;
   std::vector<uint8_t> server_handshake_binary_;
   std::vector<uint8_t> server_handshake_binary_without_finished_;
