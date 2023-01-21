@@ -57,11 +57,12 @@
 
 #include <stdint.h>
 
+#include "handshake.hpp"
 #include "handshake_type.hpp"
 
 namespace tls {
 
-class CertificateVerify {
+class CertificateVerify : public Handshake {
 public:
   CertificateVerify();
   void Parse(std::vector<uint8_t> &buf, int &p);

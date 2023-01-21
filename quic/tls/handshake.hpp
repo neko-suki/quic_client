@@ -48,7 +48,6 @@ enum {
 
 #include <stdint.h>
 
-#include "certificate_verify.hpp"
 #include "client_hello.hpp"
 #include "ecdh.hpp"
 #include "finished.hpp"
@@ -77,7 +76,7 @@ private:
   //ServerHello server_hello_;
   //EncryptedExtensions encrypted_extensions_;
   //Certificate certificate_;
-  CertificateVerify certificate_verify_;
+  //CertificateVerify certificate_verify_;
   Finished finished_;
 };
 } // namespace tls
