@@ -45,6 +45,7 @@ CIpherCuite
 #include "alpn.hpp"
 #include "ecdh.hpp"
 #include "extension.hpp"
+#include "handshake.hpp"
 #include "key_share_client_hello.hpp"
 #include "quic_transport_parameter.hpp"
 #include "server_name.hpp"
@@ -55,7 +56,7 @@ CIpherCuite
 
 namespace tls {
 
-class ClientHello {
+class ClientHello : public Handshake{
 public:
   ClientHello() = default;
 
@@ -67,6 +68,7 @@ public:
 
   std::vector<uint8_t> GetClientHello();
 
+private:
   ProtocolVersion legacy_version_;
   Random random_;
   std::vector<uint8_t> legacy_session_id;

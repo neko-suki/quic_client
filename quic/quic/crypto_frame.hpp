@@ -47,7 +47,6 @@ private:
   std::unique_ptr<tls::Finished> finished_;
   std::vector<uint8_t> server_handshake_binary_;
   std::vector<uint8_t> server_handshake_binary_without_finished_;
-  std::vector<uint8_t> server_sent_verified_;
   std::vector<uint8_t> crypto_frame_binary_;
 };
 } // namespace quic

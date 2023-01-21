@@ -56,6 +56,8 @@ void ServerHello::Parse(std::vector<uint8_t> &buf, int &p) {
       break;
     }
     default:
+      printf("ServerHello::Parse: not implemented extension %d\n", extension_type);
+      p += extension_length;
       break;
     }
   }

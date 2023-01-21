@@ -48,12 +48,6 @@ void CryptoFrame::Parse(std::vector<uint8_t> &buf, int &p) {
     std::unique_ptr<tls::Handshake> handshake =
         tls::HandshakeParser(buf, p);
 
-    if (handshake->GetMsgType() == tls::HandshakeType::finished) {
-      // finished
-
-    } else {
-    }
-
     switch (handshake->GetMsgType()) {
     case tls::HandshakeType::server_hello:
       server_hello_ = std::unique_ptr<tls::ServerHello>(
@@ -87,7 +81,6 @@ void CryptoFrame::Parse(std::vector<uint8_t> &buf, int &p) {
     case tls::HandshakeType::finished:
       finished_ = std::unique_ptr<tls::Finished>(
           reinterpret_cast<tls::Finished *>(handshake.release()));
-      server_sent_verified_ = finished_->GetVerifyData();
       break;
     default:
       printf("Unknown msg_type\n");
@@ -121,6 +114,6 @@ CryptoFrame::GetServerHandshakeBinaryWithoutFinished() {
   return server_handshake_binary_without_finished_;
 }
 std::vector<uint8_t> CryptoFrame::ServerSentFinished() {
-  return server_sent_verified_;
+  return finished_->GetVerifyData();
 }
 } // namespace quic

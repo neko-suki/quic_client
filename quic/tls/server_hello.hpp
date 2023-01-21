@@ -32,9 +32,7 @@ CIpherCuite
               +------------------------------+-------------+
 
 */
-
-#ifndef TLS_SERVER_HELLO_HPP_
-#define TLS_SERVER_HELLO_HPP_
+#pragma once
 
 #include <algorithm>
 #include <vector>
@@ -71,6 +69,4 @@ private:
   KeyShareServerHello key_share_server_hello_;
   std::vector<uint8_t> server_hello_payload_;
 };
-
 } // namespace tls
-#endif
