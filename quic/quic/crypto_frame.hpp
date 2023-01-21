@@ -30,7 +30,7 @@ public:
   void CreateFrame(std::vector<uint8_t> &initial_source_connection_id);
   std::vector<uint8_t> GetBinary();
   void Parse(std::vector<uint8_t> &buf, int &p);
-  std::vector<uint8_t> GetSharedKey(int index);
+  std::vector<uint8_t> GetSharedKey();
   tls::ECDH GetECDH();
   std::vector<uint8_t> GetClientHello();
   std::vector<uint8_t> GetServerHello();

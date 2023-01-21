@@ -154,7 +154,7 @@ int main(int argc, char **argv) {
       server_hello_crypto_frame.get());
 
   // parse handshake packet
-  std::vector<uint8_t> server_key = crypto_frame->GetSharedKey(0);
+  std::vector<uint8_t> server_key = crypto_frame->GetSharedKey();
   tls::ECDH ecdh = initial_packet.GetECDH();
   ecdh.SetPeerPublicKey(server_key);
 

@@ -23,9 +23,7 @@
           KeyShareEntry client_shares<0..2^16-1>;
       } KeyShareClientHello;
 */
-
-#ifndef TLS_KEY_SHARE_SERVER_HELLO_HPP_
-#define TLS_KEY_SHARE_SERVER_HELLO_HPP_
+#pragma once
 
 #include <vector>
 
@@ -38,8 +36,8 @@
 namespace tls {
 class KeyShareServerHello : public Extension {
 public:
-  std::vector<uint8_t> GetBinary();
   void Parse(std::vector<uint8_t> &buf, int &p);
+  std::vector<uint8_t> GetBinary();
   std::vector<uint8_t> GetSharedKey();
 
 private:
@@ -47,5 +45,3 @@ private:
 };
 
 } // namespace tls
-
-#endif

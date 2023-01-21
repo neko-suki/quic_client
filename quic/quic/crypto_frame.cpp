@@ -90,7 +90,7 @@ void CryptoFrame::Parse(std::vector<uint8_t> &buf, int &p) {
   }
 }
 
-std::vector<uint8_t> CryptoFrame::GetSharedKey(int index) {
+std::vector<uint8_t> CryptoFrame::GetSharedKey() {
   return server_hello_->GetSharedKey();
 }
 
