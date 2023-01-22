@@ -16,7 +16,7 @@ std::unique_ptr<Handshake> HandshakeParser(std::vector<uint8_t> &buf,
 
 class Handshake {
 public:
-  virtual void Parse(std::vector<uint8_t> &buf, int &p){}
+  virtual void Parse(std::vector<uint8_t> &buf, int &p) {}
 
   HandshakeType GetMsgType();
   // const Finished &GetFinished();

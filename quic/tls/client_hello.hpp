@@ -56,7 +56,7 @@ CIpherCuite
 
 namespace tls {
 
-class ClientHello : public Handshake{
+class ClientHello : public Handshake {
 public:
   ClientHello() = default;
 

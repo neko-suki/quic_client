@@ -30,7 +30,8 @@ std::vector<uint8_t> ECDH::GetPublicKey() {
 
 void ECDH::SetPeerPublicKey(std::vector<uint8_t> &public_key_vec) {
   BN_CTX *bn_ctx = BN_CTX_new();
-  EC_GROUP *ec_group = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1); // TODO: Dealing with various EC_GROUP
+  EC_GROUP *ec_group = EC_GROUP_new_by_curve_name(
+      NID_X9_62_prime256v1); // TODO: Dealing with various EC_GROUP
   peer_ = EC_POINT_new(ec_group);
 
   if (EC_POINT_oct2point(ec_group, peer_, public_key_vec.data(),

@@ -190,14 +190,19 @@ int main(int argc, char **argv) {
                             header, decoded_payload);
 
   std::unique_ptr<quic::CryptoFrame> crypto_frame_handshake;
-  std::vector<std::unique_ptr<quic::QUICFrame>> handshake_packet_crypto_frame = frame_parser.ParseAll(decoded_payload);
+  std::vector<std::unique_ptr<quic::QUICFrame>>
+      handshake_packet_crypto_frame =
+          frame_parser.ParseAll(decoded_payload);
+
   for (int i = 0; i < handshake_packet_crypto_frame.size(); i++) {
     if (handshake_packet_crypto_frame[i]->FrameType() ==
         quic::QUICFrameType::CRYPTO) {
-      crypto_frame_handshake = std::unique_ptr<quic::CryptoFrame>(dynamic_cast<quic::CryptoFrame*>(handshake_packet_crypto_frame[i].release()));
+      crypto_frame_handshake = std::unique_ptr<quic::CryptoFrame>(
+          dynamic_cast<quic::CryptoFrame *>(
+              handshake_packet_crypto_frame[i].release()));
       break;
     }
-  }  
+  }
 
   // verify data
   {

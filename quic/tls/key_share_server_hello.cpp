@@ -9,6 +9,5 @@ std::vector<uint8_t> KeyShareServerHello::GetBinary() { return {}; }
 
 std::vector<uint8_t> KeyShareServerHello::GetSharedKey() {
   return server_share_.GetSharedKey();
-
 }
 } // namespace tls

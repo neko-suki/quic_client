@@ -55,29 +55,18 @@ struct InternalPacketInfo UnprotectPacket::UnprotectHeader(
     int destination_connection_id_length;
     int source_connection_id_length;
     int token_length;
+    destination_connection_id_length = packet[p++];
+    p += destination_connection_id_length;
+    source_connection_id_length = packet[p++];
+    std::copy(packet + p, packet + p + source_connection_id_length,
+              std::back_inserter(ret.source_connection_id));
+    p += source_connection_id_length;
+
     if (((packet[0] & 0x30) >> 4) == 0) {
       // Initial Packet
-      destination_connection_id_length = packet[p++];
-      p += destination_connection_id_length;
-      source_connection_id_length = packet[p++];
-      std::copy(packet + p, packet + p + source_connection_id_length,
-                std::back_inserter(ret.source_connection_id));
-      p += source_connection_id_length;
       token_length = packet[p++];
       p += token_length;
-    } else if (((packet[0] & 0x30) >> 4) == 2) {
-      // Handshake Packet
-      destination_connection_id_length = packet[p++];
-      p += destination_connection_id_length;
-      source_connection_id_length = packet[p++];
-      std::copy(packet + p, packet + p + source_connection_id_length,
-                std::back_inserter(ret.source_connection_id));
-      p += source_connection_id_length;
-    } else {
-      printf("not implemented:\n");
-      std::exit(1);
     }
-
     length = parse_variable_length_integer(packet, p);
     pn_offset = p;
   } else {
