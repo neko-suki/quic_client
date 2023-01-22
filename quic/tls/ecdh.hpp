@@ -17,8 +17,8 @@ public:
   std::vector<uint8_t> GetSecret();
 
 private:
-  EC_KEY *key;
-  EC_POINT *peer;
+  EC_KEY *key_;
+  EC_POINT *peer_;
 };
 
 } // namespace tls
