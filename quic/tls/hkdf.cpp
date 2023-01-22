@@ -47,7 +47,6 @@ std::vector<uint8_t> HKDF::DeriveSecret(size_t hash_length,
                                         std::vector<uint8_t> &secret,
                                         std::string label,
                                         std::vector<uint8_t> &message) {
-
   tls::Hash hash;
   std::vector<uint8_t> transcript_hash =
       hash.ComputeHash(hash_length, message);

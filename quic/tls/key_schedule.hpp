@@ -1,5 +1,4 @@
-#ifndef TLS_KEY_SCHEDULE_HPP_
-#define TLS_KEY_SCHEDULE_HPP_
+#pragma once
 
 #include <iostream>
 #include <vector>
@@ -8,9 +7,6 @@
 #include <botan-2/botan/hmac.h>
 
 #include <openssl/ssl.h>
-//#include <openssl/ec.h>
-//#include <openssl/ecdh.h>
-//#include <openssl/evp.h>
 
 #include "hash.hpp"
 #include "hkdf.hpp"
@@ -46,9 +42,6 @@ public:
 
 private:
   std::vector<uint8_t> ComputeEarlySecret(size_t hash_length);
-  std::vector<uint8_t> ComputeHash(size_t hash_length,
-                                   std::vector<uint8_t> &in);
-  std::vector<uint8_t> shared_secret_;
   std::vector<uint8_t> early_secret_;
   std::vector<uint8_t> derived_secret_;
   std::vector<uint8_t> handshake_secret_;
@@ -76,5 +69,3 @@ private:
 };
 
 } // namespace tls
-
-#endif

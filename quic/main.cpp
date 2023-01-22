@@ -158,7 +158,7 @@ int main(int argc, char **argv) {
   tls::ECDH ecdh = initial_packet.GetECDH();
   ecdh.SetPeerPublicKey(server_key);
 
-  std::vector<uint8_t> secret = ecdh.GetSecret();
+  std::vector<uint8_t> shared_secret = ecdh.GetSecret();
 
   std::vector<uint8_t> client_hello_bin = initial_packet.GetClientHello();
   std::vector<uint8_t> server_hello_bin = crypto_frame->GetServerHello();
@@ -173,7 +173,7 @@ int main(int argc, char **argv) {
       hash.ComputeHash(hash_length, hello_message);
 
   tls::KeySchedule key_schedule;
-  key_schedule.ComputeHandshakeKey(hash_length, hello_hash, secret);
+  key_schedule.ComputeHandshakeKey(hash_length, hello_hash, shared_secret);
 
   printf("========== Handshake packet received ==========\n");
   std::vector<uint8_t> server_handshake_hp =
@@ -189,16 +189,15 @@ int main(int argc, char **argv) {
                             server_handshake_iv, server_handshake_key,
                             header, decoded_payload);
 
-  int buf_pointer = 0;
-  std::unique_ptr<quic::QUICFrame> handshake_frame =
-      frame_parser.Parse(decoded_payload, buf_pointer);
-  quic::CryptoFrame *crypto_frame_handshake =
-      reinterpret_cast<quic::CryptoFrame *>(handshake_frame.get());
-
-  // skip paddding frame
-  while (buf_pointer < decoded_payload.size()) {
-    frame_parser.Parse(decoded_payload, buf_pointer);
-  }
+  std::unique_ptr<quic::CryptoFrame> crypto_frame_handshake;
+  std::vector<std::unique_ptr<quic::QUICFrame>> handshake_packet_crypto_frame = frame_parser.ParseAll(decoded_payload);
+  for (int i = 0; i < handshake_packet_crypto_frame.size(); i++) {
+    if (handshake_packet_crypto_frame[i]->FrameType() ==
+        quic::QUICFrameType::CRYPTO) {
+      crypto_frame_handshake = std::unique_ptr<quic::CryptoFrame>(dynamic_cast<quic::CryptoFrame*>(handshake_packet_crypto_frame[i].release()));
+      break;
+    }
+  }  
 
   // verify data
   {
@@ -214,10 +213,10 @@ int main(int argc, char **argv) {
         hash.ComputeHash(hash_length, merged_handshake);
 
     tls::HMAC hmac;
-    std::vector<uint8_t> finished_key =
+    std::vector<uint8_t> server_finished_key =
         key_schedule.GetServerFinishedKey();
     std::vector<uint8_t> verify_data =
-        hmac.ComputeHMAC(finished_hash, finished_key);
+        hmac.ComputeHMAC(finished_hash, server_finished_key);
 
     std::vector<uint8_t> server_sent_finished =
         crypto_frame_handshake->ServerSentFinished();
@@ -306,7 +305,7 @@ int main(int argc, char **argv) {
             server_handshake_key, header, decoded_payload);
         ptr = packet_info.tag_offset + AES_BLOCK_SIZE;
 
-        buf_pointer = 0;
+        int buf_pointer = 0;
         frame_parser.Parse(decoded_payload, buf_pointer);
         printf("========== Parse Handshake Packet ACK end ==========\n");
       } else {
