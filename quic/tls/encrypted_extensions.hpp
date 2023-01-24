@@ -43,8 +43,7 @@ enum {
       } ServerHello;
 */
 
-#ifndef TLS_ENCRYPTED_EXTENSIONS_HPP_
-#define TLS_ENCRYPTED_EXTENSIONS_HPP_
+#pragma once
 
 #include <vector>
 
@@ -62,4 +61,3 @@ public:
 };
 
 } // namespace tls
-#endif // TLS_ENCRYPTED_EXTENSIONS_HPP_

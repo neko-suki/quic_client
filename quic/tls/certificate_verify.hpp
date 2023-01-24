@@ -49,9 +49,7 @@
     } CertificateVerify;
 
 */
-
-#ifndef TLS_CERTIFICATE_VERIFY_HPP_
-#define TLS_CERTIFICATE_VERIFY_HPP_
+#pragma once
 
 #include <vector>
 
@@ -64,10 +62,10 @@ namespace tls {
 
 class CertificateVerify : public Handshake {
 public:
-  CertificateVerify();
   void Parse(std::vector<uint8_t> &buf, int &p);
-  std::vector<uint8_t> signature;
+private:
+  uint16_t algorithm_;
+  std::vector<uint8_t> signature_;
 };
 
 } // namespace tls
-#endif // TLS_CERTIFICATE_VERIFY_HPP_

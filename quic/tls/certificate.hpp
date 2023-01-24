@@ -23,8 +23,7 @@
       } Certificate;
 */
 
-#ifndef TLS_CERTIFICATE_HPP_
-#define TLS_CERTIFICATE_HPP_
+#pragma once
 
 #include <vector>
 
@@ -35,19 +34,27 @@
 
 namespace tls {
 
+enum class CertificateType {
+  X509 = 0,
+  RawPublicKey = 2,
+};
+
 class CertificateEntry {
 public:
-  CertificateEntry();
   void Parse(std::vector<uint8_t> &buf, int &p);
-  uint8_t certificate_type_;
+
+private:
+  CertificateType certificate_type_;
   std::vector<uint8_t> cert_data_;
 };
 
 class Certificate : public Handshake {
 public:
   void Parse(std::vector<uint8_t> &buf, int &p);
-  CertificateEntry certificate_entry_;
+
+private:
+  std::vector<CertificateEntry> certificate_entry_;
+  std::vector<uint8_t> certificate_request_context_;
 };
 
 } // namespace tls
-#endif // TLS_CERTIFICATE_HPP_

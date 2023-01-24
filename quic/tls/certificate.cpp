@@ -2,23 +2,20 @@
 
 namespace tls {
 
-CertificateEntry::CertificateEntry() {}
-
 void CertificateEntry::Parse(std::vector<uint8_t> &buf, int &p) {
-  uint8_t certificate_type_ = buf[p];
+  certificate_type_ = static_cast<CertificateType>(buf[p]);
   uint32_t length = 0;
   switch (certificate_type_) {
-  case 0:
-    // std::cout << "certificate_type: X509" << std::endl;
+  case CertificateType::X509:
+    // X509
     length = (buf[p] << 16) | (buf[p + 1] << 8) | (buf[p + 2]);
     p += 3;
-    // std::cout << "certificate length: " << length << std::endl;
     std::copy(buf.begin() + p, buf.begin() + p + length,
               std::back_inserter(cert_data_));
     p += length;
     break;
-  case 2:
-    // std::cout << "certificate_type: RawPublicKey" << std::endl;
+  case CertificateType::RawPublicKey:
+    // RawPublicKey
     length = (buf[p] << 16) | (buf[p + 1] << 8) | (buf[p]);
     p += 3;
     std::copy(buf.begin() + p, buf.begin() + p + length,
@@ -32,14 +29,11 @@ void CertificateEntry::Parse(std::vector<uint8_t> &buf, int &p) {
   // extension
   uint32_t extension_length = (buf[p] << 8) | (buf[p + 1]);
   p += 2;
-  // std::cout << "extension_length: " << extension_length << std::endl;
   while (p < extension_length) {
     uint16_t extension_type = buf[p] << 8 | buf[p + 1];
     p += 2;
-    // std::cout << "extention type: " << extension_type << std::endl;
     uint16_t extension_length = buf[p] << 8 | buf[p + 1];
     p += 2;
-    // std::cout << "extention length: " << extension_length << std::endl;
 
     switch (extension_type) {
     default:
@@ -57,13 +51,20 @@ void Certificate::Parse(std::vector<uint8_t> &buf, int &p) {
 
   uint8_t certificate_request_context_length = buf[p];
   p++;
+  std::copy(buf.begin() + p,
+            buf.begin() + p + certificate_request_context_length,
+            std::back_inserter(certificate_request_context_));
   p += certificate_request_context_length;
 
   uint32_t certificate_list_length =
       (buf[p] << 16) | (buf[p + 1] << 8) | buf[p + 2];
   p += 3;
-  certificate_entry_.Parse(buf, p);
-  // p += certificate_list_length;
+  int p_end = p + certificate_list_length;
+  while(p < p_end){
+    CertificateEntry tmp;
+    tmp.Parse(buf, p);
+    certificate_entry_.emplace_back(tmp);
+  }
 }
 
 } // namespace tls
