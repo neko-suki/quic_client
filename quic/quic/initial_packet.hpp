@@ -42,7 +42,8 @@ public:
   void CreateInitialPacket(std::vector<uint8_t> &scid,
                            std::vector<uint8_t> &dcid);
   void CreateAckPacket(std::vector<uint8_t> &scid,
-                       std::vector<uint8_t> &dcid);
+                       std::vector<uint8_t> &dcid,
+                       uint64_t packet_number_ack);
   std::vector<uint8_t> GetBinary();
   tls::ECDH GetECDH();
   std::vector<uint8_t> GetClientHello();

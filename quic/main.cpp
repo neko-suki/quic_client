@@ -132,6 +132,7 @@ int main(int argc, char **argv) {
   struct quic::PacketInfo packet_info = p.Unprotect(
       packet, packet_size, server_initial_hp_key, server_initial_iv,
       server_initial_key, header, decoded_payload);
+  uint64_t initial_packet_number = packet_info.packet_number;
 
   id_of_server =
       packet_info.source_connection_id; // updated to choosed id by server
@@ -223,17 +224,18 @@ int main(int argc, char **argv) {
     std::vector<uint8_t> verify_data =
         hmac.ComputeHMAC(finished_hash, server_finished_key);
 
-    std::vector<uint8_t> server_sent_finished =
-        crypto_frame_handshake->ServerSentFinished();
+    std::vector<uint8_t> server_verify_data =
+        crypto_frame_handshake->GetVerifyData();
 
-    if (server_sent_finished != verify_data) {
+    if (server_verify_data != verify_data) {
       printf("Failed verify\n");
       std::exit(1);
     }
   }
 
   // send Initial ACK
-  initial_packet.CreateAckPacket(id_of_client, id_of_server);
+  initial_packet.CreateAckPacket(id_of_client, id_of_server,
+                                 initial_packet_number);
   initial_packet.Protect(initial_secret_generator);
 
   std::vector<uint8_t> initial_ack_binary = initial_packet.GetBinary();

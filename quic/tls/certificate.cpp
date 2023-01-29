@@ -60,7 +60,7 @@ void Certificate::Parse(std::vector<uint8_t> &buf, int &p) {
       (buf[p] << 16) | (buf[p + 1] << 8) | buf[p + 2];
   p += 3;
   int p_end = p + certificate_list_length;
-  while(p < p_end){
+  while (p < p_end) {
     CertificateEntry tmp;
     tmp.Parse(buf, p);
     certificate_entry_.emplace_back(tmp);

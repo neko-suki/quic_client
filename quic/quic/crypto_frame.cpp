@@ -113,7 +113,7 @@ std::vector<uint8_t>
 CryptoFrame::GetServerHandshakeBinaryWithoutFinished() {
   return server_handshake_binary_without_finished_;
 }
-std::vector<uint8_t> CryptoFrame::ServerSentFinished() {
+std::vector<uint8_t> CryptoFrame::GetVerifyData() {
   return finished_->GetVerifyData();
 }
 } // namespace quic

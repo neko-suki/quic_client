@@ -63,6 +63,7 @@ namespace tls {
 class CertificateVerify : public Handshake {
 public:
   void Parse(std::vector<uint8_t> &buf, int &p);
+
 private:
   uint16_t algorithm_;
   std::vector<uint8_t> signature_;

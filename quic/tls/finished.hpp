@@ -3,9 +3,7 @@
         opaque verify_data[Hash.length];
     } Finished;
 */
-
-#ifndef TLS_FINISHED_HPP_
-#define TLS_FINISHED_HPP_
+#pragma once
 
 #include <vector>
 
@@ -18,12 +16,11 @@ namespace tls {
 class Finished : public Handshake {
 public:
   void Parse(std::vector<uint8_t> &buf, int &p);
-  uint32_t hash_length_;
   std::vector<uint8_t> GetVerifyData() const;
 
 private:
+  uint32_t hash_length_;
   std::vector<uint8_t> verify_data_;
 };
 
 } // namespace tls
-#endif // TLS_FINISHED_HPP_

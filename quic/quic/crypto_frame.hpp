@@ -36,7 +36,7 @@ public:
   std::vector<uint8_t> GetServerHello();
   std::vector<uint8_t> GetServerHandshakeBinary();
   std::vector<uint8_t> GetServerHandshakeBinaryWithoutFinished();
-  std::vector<uint8_t> ServerSentFinished();
+  std::vector<uint8_t> GetVerifyData();
 
 private:
   tls::ClientHello client_hello_;

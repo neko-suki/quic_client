@@ -38,10 +38,11 @@ void InitialPacket::CreateInitialPacket(std::vector<uint8_t> &scid,
 }
 
 void InitialPacket::CreateAckPacket(std::vector<uint8_t> &scid,
-                                    std::vector<uint8_t> &dcid) {
+                                    std::vector<uint8_t> &dcid,
+                                    uint64_t packet_number_ack) {
   header_.clear();
   payload_.clear();
-  ack_manager.AddACK(0); // to be fixed
+  ack_manager.AddACK(packet_number_ack); // to be fixed
   payload_ = ack_manager.GenFrameBinary();
   std::vector<uint8_t> padding_frame_binary =
       GeneratePaddingFrame(1162 - payload_.size());

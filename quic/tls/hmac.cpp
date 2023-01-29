@@ -4,10 +4,6 @@ namespace tls {
 
 std::vector<uint8_t> HMAC::ComputeHMAC(std::vector<uint8_t> &in,
                                        std::vector<uint8_t> &key) {
-  HMAC_CTX *hctx = NULL;
-  std::vector<uint8_t> hmac(EVP_MAX_MD_SIZE, 0);
-  unsigned int len;
-  int inl;
   const EVP_MD *md = NULL;
 
   md = EVP_get_digestbyname("SHA256");
@@ -15,6 +11,7 @@ std::vector<uint8_t> HMAC::ComputeHMAC(std::vector<uint8_t> &in,
     fprintf(stderr, "EVP_get_digestbyname failed.\n");
   }
 
+  HMAC_CTX *hctx = NULL;
   if ((hctx = HMAC_CTX_new()) == NULL) {
     fprintf(stderr, "HMAC_CTX_new failed.\n");
     std::exit(1);
@@ -31,6 +28,8 @@ std::vector<uint8_t> HMAC::ComputeHMAC(std::vector<uint8_t> &in,
     std::exit(1);
   }
 
+  unsigned int len;
+  std::vector<uint8_t> hmac(EVP_MAX_MD_SIZE, 0);
   if (HMAC_Final(hctx, hmac.data(), &len) != SSL_SUCCESS) {
     fprintf(stderr, "HMAC_Final failed.\n");
   }
