@@ -263,7 +263,8 @@ int main(int argc, char **argv) {
 
   // generate handshake packet
   quic::Handshake handshake;
-  handshake.CreateClientHandshake(id_of_client, id_of_server, verify_data);
+  handshake.CreateClientHandshake(id_of_client, id_of_server, verify_data,
+                                  packet_info.packet_number);
 
   std::vector<uint8_t> client_handshake_hp =
       key_schedule.GetClientHandshakeHP();

@@ -27,9 +27,10 @@ void Handshake::Protect(std::vector<uint8_t> &client_key,
 
 void Handshake::CreateClientHandshake(std::vector<uint8_t> &scid,
                                       std::vector<uint8_t> &dcid,
-                                      std::vector<uint8_t> &verify_data) {
+                                      std::vector<uint8_t> &verify_data,
+                                      uint64_t packet_number) {
   CreateCryptoFrame(verify_data);
-  CreateACKFrame();
+  CreateACKFrame(packet_number);
   CreatePaddingFrame();
   CreateHeader(scid, dcid);
 }
@@ -64,9 +65,9 @@ void Handshake::CreateCryptoFrame(std::vector<uint8_t> &verify_data) {
             std::back_inserter(payload_));
 }
 
-void Handshake::CreateACKFrame() {
+void Handshake::CreateACKFrame(uint64_t packet_number) {
   ACKManager ack_manager;
-  ack_manager.AddACK(0);
+  ack_manager.AddACK(packet_number);
   std::vector<uint8_t> ack_frame_binary = ack_manager.GenFrameBinary();
   std::copy(ack_frame_binary.begin(), ack_frame_binary.end(),
             std::back_inserter(payload_));
