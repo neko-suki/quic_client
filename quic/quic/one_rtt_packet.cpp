@@ -1,6 +1,7 @@
 #include "one_rtt_packet.hpp"
 
 #include "packet_protection.hpp"
+#include "padding_frame.hpp"
 #include "socket.hpp"
 #include "variable_length_integer.hpp"
 
@@ -23,27 +24,18 @@ int OneRttPacket::CreateHeader() {
   return packet_number_offset;
 }
 
-void OneRttPacket::Send(Socket &sock, std::vector<uint8_t> &client_app_hp,
+std::vector<uint8_t>
+OneRttPacket::GetBinary(std::vector<uint8_t> &client_app_hp,
                         std::vector<uint8_t> &client_app_key,
                         std::vector<uint8_t> &client_app_iv) {
   if (payload_.size() < 1162) {
-    // padding
-    while (payload_.size() < 1162) {
-      payload_.push_back(0);
-    }
+    std::vector<uint8_t> padding_frame =
+        GeneratePaddingFrame(1162 - payload_.size());
+    std::copy(padding_frame.begin(), padding_frame.end(),
+              std::back_inserter(payload_));
   }
 
   int packet_number_offset = CreateHeader();
-
-  unsigned char nonce[12] = {0};
-  for (int i = 0; i < 8; i++) {
-    nonce[11 - i] = (packet_number_ >> (i * 8)) & 0xff;
-  }
-
-  // client iv can be obtained
-  for (int i = 0; i < 12; i++) {
-    nonce[i] = nonce[i] ^ client_app_iv[i];
-  }
 
   std::vector<uint8_t> encrypted_payload(payload_.size());
   std::vector<uint8_t> tag(AES_BLOCK_SIZE);
@@ -57,10 +49,8 @@ void OneRttPacket::Send(Socket &sock, std::vector<uint8_t> &client_app_hp,
   std::copy(encrypted_payload.begin(), encrypted_payload.end(),
             std::back_inserter(send_binary));
   std::copy(tag.begin(), tag.end(), std::back_inserter(send_binary));
-  sock.Send(send_binary);
 
-  header_.clear();
-  payload_.clear();
+  return send_binary;
 }
 
 void OneRttPacket::AddFrame(std::vector<uint8_t> frame_binary) {

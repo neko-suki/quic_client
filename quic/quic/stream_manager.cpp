@@ -14,9 +14,9 @@ StreamFrame StreamManager::CreateClientInitiatedBidirectionalStream() {
       0x02	Client-Initiated, Unidirectional
       0x03	Server-Initiated, Unidirectional
   */
-  StreamFrame tmp;
-  tmp.SetStreamID((client_initiated_bidirectional_stream_id_++) << 2);
-  return tmp;
+  StreamFrame stream;
+  stream.SetStreamID((client_initiated_bidirectional_stream_id_++) << 2);
+  return stream;
 }
 
 } // namespace quic

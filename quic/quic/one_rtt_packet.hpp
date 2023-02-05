@@ -11,10 +11,10 @@ namespace quic {
 class OneRttPacket {
 public:
   OneRttPacket(std::vector<uint8_t> dst_id, uint64_t packet_number);
-  void Send(Socket &sock, std::vector<uint8_t> &client_app_hp,
-            std::vector<uint8_t> &client_app_key,
-            std::vector<uint8_t> &client_app_iv);
   void AddFrame(std::vector<uint8_t> frame_binary);
+  std::vector<uint8_t> GetBinary(std::vector<uint8_t> &client_app_hp,
+                                 std::vector<uint8_t> &client_app_key,
+                                 std::vector<uint8_t> &client_app_iv);
 
 private:
   int CreateHeader();

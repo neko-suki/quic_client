@@ -348,8 +348,9 @@ int main(int argc, char **argv) {
         quic::OneRttPacket one_rtt_packet(
             id_of_server, packet_number_manager.GetPacketNumber());
         one_rtt_packet.AddFrame(ack_binary);
-        one_rtt_packet.Send(sock, client_app_hp, client_app_key,
-                            client_app_iv);
+        std::vector<uint8_t> send_binary = one_rtt_packet.GetBinary(
+            client_app_hp, client_app_key, client_app_iv);
+        sock.Send(send_binary);
       }
     }
   });
@@ -374,8 +375,9 @@ int main(int argc, char **argv) {
       quic::OneRttPacket one_rtt_packet(
           id_of_server, packet_number_manager.GetPacketNumber());
       one_rtt_packet.AddFrame(stream_frame);
-      one_rtt_packet.Send(sock, client_app_hp, client_app_key,
-                          client_app_iv);
+      std::vector<uint8_t> send_binary = one_rtt_packet.GetBinary(
+          client_app_hp, client_app_key, client_app_iv);
+      sock.Send(send_binary);
     }
   }
 
