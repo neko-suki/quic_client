@@ -304,7 +304,7 @@ int main(int argc, char **argv) {
   std::thread recv_thread([&] {
     while (true) {
       read_size = sock.RecvFrom(packet, packet_size);
-      quic::PacketType packet_type = quic::IsLongHeaderPacket(packet);
+      quic::PacketType packet_type = quic::GetPacketType(packet);
       if (quic::PacketType::Handshake == packet_type) {
         printf("========== Handshake Packet received ==========\n");
         header.clear();
@@ -313,8 +313,7 @@ int main(int argc, char **argv) {
             server_handshake_key, header, decoded_payload);
         ptr = packet_info.tag_offset + AES_BLOCK_SIZE;
 
-        int buf_pointer = 0;
-        frame_parser.Parse(decoded_payload, buf_pointer);
+        frame_parser.ParseAll(decoded_payload);
         printf("========== Parse Handshake Packet ACK end ==========\n");
       } else {
         printf("========== 1-RTT packet received ==========\n");

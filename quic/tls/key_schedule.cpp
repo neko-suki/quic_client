@@ -71,7 +71,6 @@ void KeySchedule::ComputeHandshakeKey(
 
 void KeySchedule::ComputeApplicationKey(
     size_t hash_length, std::vector<uint8_t> &handshake_hash) {
-
   HKDF hkdf;
 
   // derived secret
@@ -196,6 +195,7 @@ void KeySchedule::DumpKeylog() {
     fprintf(fp, "%02x", ssecret_[i]);
   }
   fprintf(fp, "\n");
+
   fprintf(fp, "CLIENT_HANDSHAKE_TRAFFIC_SECRET ");
   for (int i = 0; i < early_secret_.size(); i++) {
     fprintf(fp, "%02x", early_secret_[i]);
@@ -215,6 +215,7 @@ void KeySchedule::DumpKeylog() {
     fprintf(fp, "%02x", smaster_secret_[i]);
   }
   fprintf(fp, "\n");
+
   fprintf(fp, "CLIENT_TRAFFIC_SECRET_0 ");
   for (int i = 0; i < early_secret_.size(); i++) {
     fprintf(fp, "%02x", early_secret_[i]);

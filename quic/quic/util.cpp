@@ -4,7 +4,7 @@
 
 namespace quic {
 
-PacketType IsLongHeaderPacket(unsigned char *packet) {
+PacketType GetPacketType(unsigned char *packet) {
   if (packet[0] && 0x80) {
     switch ((packet[0] & 0x30) >> 4) {
     case 0:

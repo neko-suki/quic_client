@@ -1,3 +1,5 @@
+#include "../tls/handshake_type.hpp"
+
 #include "handshake.hpp"
 
 #include "ack_manager.hpp"
@@ -37,7 +39,7 @@ void Handshake::CreateClientHandshake(std::vector<uint8_t> &scid,
 
 void Handshake::CreateCryptoFrame(std::vector<uint8_t> &verify_data) {
   std::vector<uint8_t> handshake;
-  handshake.push_back(20);
+  handshake.push_back(static_cast<uint8_t>(tls::HandshakeType::finished));
   uint8_t finished_length[3] = {
       static_cast<uint8_t>((verify_data.size() & 0xff0000) >> 16),
       static_cast<uint8_t>((verify_data.size() & 0xff00) >> 8),
@@ -115,7 +117,6 @@ void Handshake::CreateHeader(std::vector<uint8_t> &scid,
   std::copy(length_binary.begin(), length_binary.end(),
             std::back_inserter(header_));
   packet_number_offset_ += length_binary.size();
-  // printf("length of handshake: %ld\n", 1 + payload_.size() + 16);
 
   // packet number length
   uint8_t pn[1] = {static_cast<uint8_t>(packet_number_)};

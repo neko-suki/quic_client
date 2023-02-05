@@ -1,5 +1,4 @@
-#ifndef QUIC_HANDSHAKE_HPP_
-#define QUIC_HANDSHAKE_HPP_
+#pragma once
 
 #include <stdint.h>
 #include <vector>
@@ -37,6 +36,4 @@ private:
   uint32_t packet_number_;
   uint32_t packet_number_offset_;
 };
-
 } // namespace quic
-#endif // TLS_HANDSHAKE_HPP_

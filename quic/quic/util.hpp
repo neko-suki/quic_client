@@ -10,5 +10,5 @@ enum class PacketType {
   Unknown = 0x20
 };
 
-PacketType IsLongHeaderPacket(unsigned char *packet);
+PacketType GetPacketType(unsigned char *packet);
 } // namespace quic
