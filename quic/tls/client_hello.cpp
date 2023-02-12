@@ -16,9 +16,7 @@ void ClientHello::CreateClientHello(
       0x96, 0x47, 0x2e, 0xc4, 0x0b, 0xb8, 0x63, 0xcf, 0xd3, 0xe8, 0x68,
       0x04, 0xfe, 0x3a, 0x47, 0xf0, 0x6a, 0x2b, 0x69, 0x48, 0x4c};
   std::copy(random_input, random_input + 32, random_);
-  for (int i = 0; i < 32; i++) {
-    tmp.push_back(random_[i]);
-  }
+  std::copy(random_, random_ + 32, std::back_inserter(tmp));
 
   // length of legacy session_id = 0
   tmp.push_back(0x00);
@@ -26,12 +24,13 @@ void ClientHello::CreateClientHello(
   // set cipher suite
   // length of ciphter suite
   cipher_suites.push_back(CipherSuite::TLS_AES_128_GCM_SHA256);
-  uint8_t length[2] = {
-      static_cast<uint8_t>(((2 * cipher_suites.size()) & 0x00ff00) >> 8),
-      static_cast<uint8_t>(((2 * cipher_suites.size()) & 0x0000ff))};
-  for (int i = 0; i < 2; i++) {
-    tmp.push_back(length[i]);
-  }
+
+  // length of cipher suites
+  tmp.push_back(
+      static_cast<uint8_t>(((2 * cipher_suites.size()) & 0x00ff00) >> 8));
+  tmp.push_back(
+      static_cast<uint8_t>(((2 * cipher_suites.size()) & 0x0000ff)));
+
   // cipher suite
   for (const auto &cipher_suite : cipher_suites) {
     int val = static_cast<uint16_t>(cipher_suite);
@@ -79,26 +78,21 @@ void ClientHello::CreateClientHello(
             std::back_inserter(extensions));
 
   // length of extension
-  uint8_t extension_length[2] = {
-      static_cast<uint8_t>((extensions.size() & 0xff00) >> 8),
-      static_cast<uint8_t>((extensions.size() & 0xff))};
-  for (int i = 0; i < 2; i++) {
-    tmp.push_back(extension_length[i]);
-  }
+  tmp.push_back(static_cast<uint8_t>((extensions.size() & 0xff00) >> 8));
+  tmp.push_back(static_cast<uint8_t>((extensions.size() & 0xff)));
 
   // extension
   std::copy(extensions.begin(), extensions.end(), std::back_inserter(tmp));
 
   // client hello
   client_hello_.push_back(0x01); // client hello
-  // 24 bit length to ret
-  uint8_t tmp_length[3] = {
-      static_cast<uint8_t>((tmp.size() & 0xff0000) >> 16),
-      static_cast<uint8_t>((tmp.size() & 0xff00) >> 8),
-      static_cast<uint8_t>(tmp.size() & 0xff)};
-  for (int i = 0; i < 3; i++) {
-    client_hello_.push_back(tmp_length[i]);
-  }
+
+  // 24 bit length of client_hello binary
+  client_hello_.push_back(
+      static_cast<uint8_t>((tmp.size() & 0xff0000) >> 16));
+  client_hello_.push_back(
+      static_cast<uint8_t>((tmp.size() & 0xff00) >> 8));
+  client_hello_.push_back(static_cast<uint8_t>(tmp.size() & 0xff));
 
   std::copy(tmp.begin(), tmp.end(), std::back_inserter(client_hello_));
 }
