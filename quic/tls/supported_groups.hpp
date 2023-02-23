@@ -32,6 +32,7 @@ class SupportedGroups : public Extension {
 public:
   SupportedGroups();
   std::vector<uint8_t> GetBinary();
+private:
   std::vector<uint8_t> named_group_list;
 };
 } // namespace tls
