@@ -11,8 +11,9 @@ namespace quic {
 
 class FrameParser {
 public:
-  std::unique_ptr<QUICFrame> Parse(std::vector<uint8_t> &buf, int &p);
   std::vector<std::unique_ptr<QUICFrame>>
   ParseAll(std::vector<uint8_t> &buf);
+private:
+  std::unique_ptr<QUICFrame> Parse(std::vector<uint8_t> &buf, int &p);
 };
 } // namespace quic
