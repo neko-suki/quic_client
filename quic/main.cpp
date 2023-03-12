@@ -248,11 +248,19 @@ int main(int argc, char **argv) {
   std::vector<uint8_t> merged_handshake = client_hello_bin;
   std::copy(server_hello_bin.begin(), server_hello_bin.end(),
             std::back_inserter(merged_handshake));
-  std::vector<uint8_t> handshake_server_hello_to_server_fin =
+  std::vector<uint8_t> server_handshake =
       crypto_frame_handshake->GetServerHandshakeBinary();
-  std::copy(handshake_server_hello_to_server_fin.begin(),
-            handshake_server_hello_to_server_fin.end(),
+  std::copy(server_handshake.begin(),
+            server_handshake.end(),
             std::back_inserter(merged_handshake));
+
+
+ for(int i = 0;i < server_hello_bin.size();i++)printf("%02x", server_hello_bin[i]);
+ printf("\n");
+
+ for(int i = 0;i < server_handshake.size();i++)printf("%02x", server_handshake[i]);
+ printf("\n");
+
 
   std::vector<uint8_t> finished_hash =
       hash.ComputeHash(hash_length, merged_handshake);
