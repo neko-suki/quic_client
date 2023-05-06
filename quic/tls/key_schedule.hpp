@@ -3,9 +3,6 @@
 #include <iostream>
 #include <vector>
 
-#include <botan-2/botan/hkdf.h>
-#include <botan-2/botan/hmac.h>
-
 #include <openssl/ssl.h>
 
 #include "hash.hpp"

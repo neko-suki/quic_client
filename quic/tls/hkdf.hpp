@@ -5,8 +5,6 @@
 #include <string>
 #include <vector>
 
-#include <botan-2/botan/hkdf.h>
-#include <botan-2/botan/hmac.h>
 #include <openssl/evp.h>
 
 #include "../tls/hash.hpp"

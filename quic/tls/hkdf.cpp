@@ -1,23 +1,40 @@
 #include "hkdf.hpp"
 
+#include <cstring>
+
+#include <openssl/kdf.h>
+#include <openssl/core_names.h>
+
 namespace tls {
 HKDF::HKDF() {}
 
 std::vector<uint8_t> HKDF::Extract(size_t hash_len,
                                    const std::vector<uint8_t> &salt,
                                    const std::vector<uint8_t> &ikm) {
-  std::unique_ptr<Botan::KDF> hkdf(
-      Botan::KDF::create(std::string("HKDF-Extract(HMAC(SHA-256))")));
-  Botan::secure_vector<uint8_t> sret;
-  /*
-  secure_vector< uint8_t > Botan::KDF::derive_key	(	size_t
-  key_len, const uint8_t 	secret[], size_t 	secret_len, const
-  uint8_t 	salt[], size_t 	salt_len, const uint8_t 	label[] =
-  nullptr, size_t 	label_len = 0 )		const
-  */
-  sret = hkdf->derive_key(hash_len, ikm.data(), ikm.size(), salt.data(),
-                          salt.size(), nullptr, 0);
-  std::vector<uint8_t> ret(sret.begin(), sret.end());
+
+  EVP_KDF *kdf;
+  EVP_KDF_CTX *kctx;
+  OSSL_PARAM params[6], *p = params;
+
+  kdf = EVP_KDF_fetch(NULL, "HKDF", NULL);
+  kctx = EVP_KDF_CTX_new(kdf);
+  EVP_KDF_free(kdf);
+
+  *p++ = OSSL_PARAM_construct_utf8_string(OSSL_KDF_PARAM_DIGEST, SN_sha256, strlen(SN_sha256));
+  *p++ = OSSL_PARAM_construct_octet_string(OSSL_KDF_PARAM_KEY, const_cast<unsigned char*>(ikm.data()), ikm.size());
+  *p++ = OSSL_PARAM_construct_octet_string(OSSL_KDF_PARAM_INFO, nullptr, 0);
+  *p++ = OSSL_PARAM_construct_octet_string(OSSL_KDF_PARAM_SALT, const_cast<unsigned char*>(salt.data()), salt.size());
+  int32_t mode = EVP_KDF_HKDF_MODE_EXTRACT_ONLY;
+  *p++ = OSSL_PARAM_construct_int32(OSSL_KDF_PARAM_MODE, &mode);
+  *p = OSSL_PARAM_construct_end();
+
+  std::vector<uint8_t> ret(256/8); // TODO
+
+  if (EVP_KDF_derive(kctx, ret.data(), ret.size(), params) <= 0){
+    perror("EVP_KDF_derive");
+  }
+  EVP_KDF_CTX_free(kctx);
+
   return ret;
 }
 
@@ -25,6 +42,8 @@ std::vector<uint8_t> HKDF::ExpandLabel(std::vector<uint8_t> &secret,
                                        std::string label_string,
                                        std::vector<uint8_t> &context,
                                        size_t key_length) {
+  printf("HKDF::ExpandLabel\n");
+
   std::string label = {static_cast<char>((key_length & 0xff00) >> 8),
                        static_cast<char>((key_length & 0xff))};
   label_string = "tls13 " + label_string;
@@ -34,12 +53,30 @@ std::vector<uint8_t> HKDF::ExpandLabel(std::vector<uint8_t> &secret,
 
   std::copy(context.begin(), context.end(), std::back_inserter(label));
 
-  std::unique_ptr<Botan::KDF> hkdf(
-      Botan::KDF::create(std::string("HKDF-Expand(HMAC(SHA-256))")));
-  Botan::secure_vector<uint8_t> key = hkdf->derive_key(
-      key_length, secret.data(), secret.size(), "", label);
+  EVP_KDF *kdf;
+  EVP_KDF_CTX *kctx;
+  OSSL_PARAM params[5], *p = params;
 
-  std::vector<uint8_t> ret(key.begin(), key.end());
+  kdf = EVP_KDF_fetch(NULL, "HKDF", NULL);
+  kctx = EVP_KDF_CTX_new(kdf);
+  EVP_KDF_free(kdf);
+
+  *p++ = OSSL_PARAM_construct_utf8_string(OSSL_KDF_PARAM_DIGEST, SN_sha256, strlen(SN_sha256));
+  *p++ = OSSL_PARAM_construct_octet_string(OSSL_KDF_PARAM_KEY, const_cast<unsigned char*>(secret.data()), secret.size());
+  *p++ = OSSL_PARAM_construct_octet_string(OSSL_KDF_PARAM_INFO,
+                                         label.data(), label.size());
+  int32_t mode = EVP_KDF_HKDF_MODE_EXPAND_ONLY;
+  *p++ = OSSL_PARAM_construct_int32(OSSL_KDF_PARAM_MODE, &mode);
+
+  *p = OSSL_PARAM_construct_end();
+
+  std::vector<uint8_t> ret(256/8); // TODO
+
+  if (EVP_KDF_derive(kctx, ret.data(), ret.size(), params) <= 0){
+    perror("EVP_KDF_derive");
+  }
+  EVP_KDF_CTX_free(kctx);
+
   return ret;
 }
 

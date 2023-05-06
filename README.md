@@ -7,9 +7,7 @@ Ubuntu 20.04
 # requirement
 
 - CMake >= v3.2
-- OpenSSL v1.1.1f
-- libbotan-2-dev/focal,now 2.12.1-2build1 amd64
-
+- OpenSSL v3.1.0
 
 # How to use
 ## How to build
