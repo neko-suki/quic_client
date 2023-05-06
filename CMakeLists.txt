@@ -58,15 +58,14 @@ quic/quic/stream_manager.cpp
 quic/quic/util.cpp
 quic/quic/variable_length_integer.cpp
 )
+
 add_executable(quic_client ${SOURCE_FILES})
 target_compile_definitions(quic_client PUBLIC -DOPEN_MODE2=\"rb\")
-target_include_directories(quic_client PUBLIC /usr/include/botan-2)
-target_link_libraries(quic_client crypto ssl botan-2 pthread)
+target_link_libraries(quic_client crypto ssl pthread)
 install(TARGETS quic_client DESTINATION ${DIVISIBLE_INSTALL_BIN_DIR})
 
 # client_initial test
 add_executable(client_initial_test ${SOURCE_FILES})
 target_compile_definitions(client_initial_test PUBLIC -DOPEN_MODE2=\"rb\")
-target_include_directories(client_initial_test PUBLIC /usr/include/botan-2)
-target_link_libraries(client_initial_test crypto ssl botan-2 pthread)
+target_link_libraries(client_initial_test crypto ssl pthread)
 install(TARGETS client_initial_test DESTINATION ${DIVISIBLE_INSTALL_BIN_DIR})
