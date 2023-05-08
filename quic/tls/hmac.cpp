@@ -4,33 +4,40 @@ namespace tls {
 
 std::vector<uint8_t> HMAC::ComputeHMAC(std::vector<uint8_t> &in,
                                        std::vector<uint8_t> &key) {
-  const EVP_MD *md = NULL;
+  EVP_MAC *mac = NULL;
 
-  md = EVP_get_digestbyname("SHA256");
-  if (md == NULL) {
+  mac = EVP_MAC_fetch(NULL, "HMAC", NULL);
+  if (mac == NULL) {
     fprintf(stderr, "EVP_get_digestbyname failed.\n");
   }
 
-  HMAC_CTX *hctx = NULL;
-  if ((hctx = HMAC_CTX_new()) == NULL) {
-    fprintf(stderr, "HMAC_CTX_new failed.\n");
+  EVP_MAC_CTX *ctx = NULL;
+  if ((ctx = EVP_MAC_CTX_new(mac)) == NULL) {
+    fprintf(stderr, "EVP_MAC_CTX_new failed.\n");
     std::exit(1);
   }
 
-  if (HMAC_Init_ex(hctx, key.data(), key.size(), md, NULL) !=
+  OSSL_PARAM params[2];
+  size_t params_n = 0;
+  const char *digest = "SHA256";
+
+  params[params_n++] = OSSL_PARAM_construct_utf8_string("digest", const_cast<char*>(digest), 0);
+  params[params_n] = OSSL_PARAM_construct_end();
+
+  if (EVP_MAC_init(ctx, key.data(), key.size(), params) !=
       SSL_SUCCESS) {
     fprintf(stderr, "HMAC_Init failed.\n");
     std::exit(1);
   }
 
-  if (HMAC_Update(hctx, in.data(), in.size()) != SSL_SUCCESS) {
+  if (EVP_MAC_update(ctx, in.data(), in.size()) != SSL_SUCCESS) {
     fprintf(stderr, "HMAC_Update failed.\n");
     std::exit(1);
   }
 
-  unsigned int len;
+  size_t len;
   std::vector<uint8_t> hmac(EVP_MAX_MD_SIZE, 0);
-  if (HMAC_Final(hctx, hmac.data(), &len) != SSL_SUCCESS) {
+  if (EVP_MAC_final(ctx, hmac.data(), &len, hmac.size()) != SSL_SUCCESS) {
     fprintf(stderr, "HMAC_Final failed.\n");
   }
 
