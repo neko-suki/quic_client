@@ -7,6 +7,7 @@
 #include <openssl/ecdh.h>
 #include <openssl/evp.h>
 
+
 namespace tls {
 
 class ECDH {
@@ -19,6 +20,10 @@ public:
 private:
   EC_KEY *key_;
   EC_POINT *peer_;
+
+  EVP_PKEY *pkey_;
+  EVP_PKEY_CTX *pctx_;
+
 };
 
 } // namespace tls
