@@ -24,6 +24,10 @@ private:
   EVP_PKEY *pkey_;
   EVP_PKEY_CTX *pctx_;
 
+  EVP_PKEY_CTX *pctx2_;
+  EVP_PKEY *peer_pkey_;
+
+
 };
 
 } // namespace tls
