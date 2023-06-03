@@ -187,7 +187,7 @@ void UnprotectPacket::UnprotectPayload(std::vector<uint8_t> &header,
       evp, original_payload + original_payload_sz, &original_payload_sz);
   if (test <= 0 && ERR_get_error() != 0) {
     fprintf(stderr,
-            "ERROR: EVP_CipherFinal_ex failed. OpenSSL error: %s\n",
+            "ERROR: EVP_CipherFinal_ex failed. test: %d, OpenSSL error: %s\n",test,
             ERR_error_string(ERR_get_error(), NULL));
     return;
   }
