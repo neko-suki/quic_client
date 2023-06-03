@@ -42,8 +42,6 @@ std::vector<uint8_t> HKDF::ExpandLabel(std::vector<uint8_t> &secret,
                                        std::string label_string,
                                        std::vector<uint8_t> &context,
                                        size_t key_length) {
-  printf("HKDF::ExpandLabel\n");
-
   std::string label = {static_cast<char>((key_length & 0xff00) >> 8),
                        static_cast<char>((key_length & 0xff))};
   label_string = "tls13 " + label_string;

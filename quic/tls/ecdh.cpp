@@ -8,21 +8,6 @@
 namespace tls {
 
 bool ECDH::CreateKey(void) {
-  /*
-  if (NULL == (key_ = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1))) {
-    printf("Failed to create key curve\n");
-    return false;
-  }
-
-  if (1 != EC_KEY_generate_key(key_)) {
-    printf("Failed to generate key\n");
-    return false;
-  }
-
-  EC_KEY_print_fp(stdout, key_, 0);
-  */
-
-  // new implementation
   // https://www.openssl.org/docs/man3.1/man7/EVP_PKEY-EC.html
   pkey_ = EVP_EC_gen("prime256v1");
   OSSL_PARAM params[2];
@@ -38,31 +23,21 @@ bool ECDH::CreateKey(void) {
   EVP_PKEY_generate(pctx_, &pkey_);
 
  // https://www.openssl.org/docs/man3.0/man3/BIO_s_fd.html
-  BIO *out;
-  out = BIO_new_fd(fileno(stdout), BIO_NOCLOSE);
-  BIO_printf(out, "------------------------ Hello World ------------------\n");
-  BIO_printf(out, "PublicKey\n");
-  EVP_PKEY_print_public(out, pkey_, 0, NULL);
-  BIO_printf(out, "PrivateKey\n");
-  EVP_PKEY_print_private(out, pkey_, 0, NULL);
-  BIO_free(out);
+  /*
+    BIO *out;
+    out = BIO_new_fd(fileno(stdout), BIO_NOCLOSE);
+    BIO_printf(out, "------------------------ Hello World ------------------\n");
+    BIO_printf(out, "PublicKey\n");
+    EVP_PKEY_print_public(out, pkey_, 0, NULL);
+    BIO_printf(out, "PrivateKey\n");
+    EVP_PKEY_print_private(out, pkey_, 0, NULL);
+    BIO_free(out);
+  */
 
   return true;
 }
 
 std::vector<uint8_t> ECDH::GetPublicKey() {
-/*
-  // internal to octet
-  int size = i2o_ECPublicKey(key_, nullptr); // deprecated
-  unsigned char *buf = new unsigned char[size];
-  std::vector<uint8_t> ret(size);
-  i2o_ECPublicKey(key_, &buf);
-  buf -= size;
-  std::copy(buf, buf + size, ret.begin());
-  return ret;
-*/
-
-  // new implementation
   size_t out_pubkey_len = 0;
   // get length
   if (!EVP_PKEY_get_octet_string_param(pkey_, OSSL_PKEY_PARAM_PUB_KEY, NULL, 0, &out_pubkey_len)) {
@@ -76,32 +51,18 @@ std::vector<uint8_t> ECDH::GetPublicKey() {
     std::exit(1);
   }
 
-  BIO_dump_indent_fp(stdout, ret2.data(), out_pubkey_len, 2);
-  for(int i = 0;i < out_pubkey_len;i++){
-    printf("%02x", ret2[i]);
-  }
-  printf("\n");
+  /*
+    BIO_dump_indent_fp(stdout, ret2.data(), out_pubkey_len, 2);
+    for(int i = 0;i < out_pubkey_len;i++){
+      printf("%02x", ret2[i]);
+    }
+    printf("\n");
+  */
 
   return ret2;
 }
 
 void ECDH::SetPeerPublicKey(std::vector<uint8_t> &public_key_vec) {
-/*
-  int error;
-  BN_CTX *bn_ctx = BN_CTX_new();
-  EC_GROUP *ec_group = EC_GROUP_new_by_curve_name(
-      NID_X9_62_prime256v1); // TODO: Dealing with various EC_GROUP
-  peer_ = EC_POINT_new(ec_group);
-
-  if (EC_POINT_oct2point(ec_group, peer_, public_key_vec.data(),
-                         public_key_vec.size(), bn_ctx)) {
-  } else {
-    fprintf(stdout, "EC_POINT_oct2point failed\n");
-    std::exit(1);
-  }
-*/
-
-  // new implementation
   peer_pkey_ = EVP_PKEY_new();
   int error;
 
@@ -116,12 +77,13 @@ void ECDH::SetPeerPublicKey(std::vector<uint8_t> &public_key_vec) {
     std::exit(1);
   }
 
-// check output
-  BIO *dbg_out;
-  dbg_out = BIO_new_fd(fileno(stdout), BIO_NOCLOSE);
-  BIO_printf(dbg_out, "------------------------ Hello World2 ------------------\n");
-  BIO_printf(dbg_out, "PrivateKey\n");
-  EVP_PKEY_print_public(dbg_out, peer_pkey_, 0, NULL);
+  // check output
+  /*
+    BIO *dbg_out;
+    dbg_out = BIO_new_fd(fileno(stdout), BIO_NOCLOSE);
+    BIO_printf(dbg_out, "PrivateKey\n");
+    EVP_PKEY_print_public(dbg_out, peer_pkey_, 0, NULL);
+  */
 
   int nid = EVP_PKEY_get_id(pkey_);
   pctx2_ = EVP_PKEY_CTX_new(pkey_, NULL);
@@ -132,31 +94,9 @@ void ECDH::SetPeerPublicKey(std::vector<uint8_t> &public_key_vec) {
     fprintf(stderr, "EVP_PKEY_derive_set_peer failed: error %d\n", error);
     std::exit(1);
   }
-  fprintf(stderr, "EVP_PKEY_derive_set_peer no error\n");
 }
 
 std::vector<uint8_t> ECDH::GetSecret() {
-/*
-  int field_size;
-  field_size = EC_GROUP_get_degree(EC_KEY_get0_group(key_)); // deprecated
-  if (field_size <= 0) {
-    fprintf(stdout, "EC_GROUP_get_degree\n");
-    std::exit(1);
-  }
-
-  size_t secret_len = (field_size + 7) / 8;
-
-  std::vector<uint8_t> secret(secret_len);
-
-  secret_len =
-      ECDH_compute_key(secret.data(), secret_len, peer_, key_, NULL); // deprecated
-  if (secret_len <= 0) {
-    std::exit(1);
-  }
-
-  //return secret;
-*/
-
   // new implementation
   size_t skey_len;
   int error;
@@ -170,10 +110,6 @@ std::vector<uint8_t> ECDH::GetSecret() {
     fprintf(stdout, "Failed. get size of key: error %d\n", error);
     std::exit(1);
   }
-  fprintf(stdout, "size of skey: %lu. secret.size() : %lu\n", skey_len, secret.size());
-
-
-
 
   return secret;
 }
