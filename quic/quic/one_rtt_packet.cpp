@@ -5,13 +5,18 @@
 #include "socket.hpp"
 #include "variable_length_integer.hpp"
 
+#include <cmath>
+#include <iostream>
+
 namespace quic {
 OneRttPacket::OneRttPacket(std::vector<uint8_t> dst_id,
-                           uint64_t packet_number)
-    : packet_number_(packet_number), dst_id_(dst_id) {}
+                           uint64_t packet_number, std::optional<uint64_t> largest_acked)
+    : packet_number_(packet_number), dst_id_(dst_id), largest_acked_(largest_acked) {}
 
 int OneRttPacket::CreateHeader() {
+  printf("=== CreateHeader: packet_number_: %ld\n", packet_number_);
   VariableLengthInteger packet_number_v(packet_number_);
+  packet_number_v.SetNumBytes(GenerateMask());
   std::vector<uint8_t> packet_number_binary = packet_number_v.GetBinary();
 
   uint8_t first_byte = 0b01000000;
@@ -57,5 +62,23 @@ void OneRttPacket::AddFrame(std::vector<uint8_t> frame_binary) {
   std::copy(frame_binary.begin(), frame_binary.end(),
             std::back_inserter(payload_));
 }
+
+int OneRttPacket::GenerateMask(){
+  uint64_t ret;
+  uint64_t num_unacked;
+  if (!largest_acked_.has_value()){
+    num_unacked = packet_number_ + 1;
+  } else {
+    num_unacked = packet_number_ - largest_acked_.value();
+  }
+
+
+  int32_t min_bits = ceil(std::log2(num_unacked)) + 1;
+  int32_t num_bytes = std::ceil(min_bits/8.0);
+
+  ret = ((1LL<<min_bits)-1) & packet_number_;
+  return num_bytes;
+}
+
 
 } // namespace quic

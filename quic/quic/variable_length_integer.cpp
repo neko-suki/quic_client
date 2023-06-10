@@ -1,5 +1,7 @@
 #include "variable_length_integer.hpp"
 
+#include <iostream>
+
 namespace quic {
 VariableLengthInteger::VariableLengthInteger(int a) : val_(a) {}
 VariableLengthInteger::VariableLengthInteger(uint8_t a) : val_(a) {}
@@ -36,6 +38,18 @@ std::vector<uint8_t> VariableLengthInteger::GetBinary() {
   for (int i = 0; i < len; i++) {
     ret.push_back(array[i]);
   }
+  if (!num_bytes_.has_value()){
+    return ret;
+  }
+  for(int i = 0;i < ret.size() - num_bytes_.value();i++){
+    ret[i] = ret[i+num_bytes_.value()];
+  }
+  ret.resize(num_bytes_.value());
   return ret;
 }
+
+void VariableLengthInteger::SetNumBytes(int32_t num_bytes){
+  num_bytes_ = num_bytes;
+}
+
 } // namespace quic
