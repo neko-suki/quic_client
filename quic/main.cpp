@@ -371,26 +371,6 @@ int main(int argc, char **argv) {
     }
   });
 
-/*
-std::thread ping_thread([&] {
-    while (true) {
-      printf("PING thread\n");
-
-      quic::OneRttPacket one_rtt_packet(
-          id_of_server, packet_number_manager.GetPacketNumber());
-      std::vector<uint8_t> ping_Frame(1,0x01);
-      one_rtt_packet.AddFrame(ping_Frame);
-      std::vector<uint8_t> send_binary = one_rtt_packet.GetBinary(
-          client_app_hp, client_app_key, client_app_iv);
-      sock.Send(send_binary);
-
-      sleep(1);
-
-    }
-  });
-*/
-
-
   {
     std::unique_lock<std::mutex> lk(mtx);
     cond.wait(lk, [&handshake_done] { return handshake_done; });
@@ -418,7 +398,6 @@ std::thread ping_thread([&] {
   }
 
   recv_thread.join();
- // ping_thread.join();
 
   sleep(10);
   return 0;
