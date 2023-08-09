@@ -79,6 +79,4 @@ int OneRttPacket::GenerateMask(){
   ret = ((1LL<<min_bits)-1) & packet_number_;
   return num_bytes;
 }
-
-
 } // namespace quic

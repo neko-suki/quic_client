@@ -28,5 +28,4 @@ private:
 
   std::optional<uint64_t> largest_acked_;
 };
-
 } // namespace quic
