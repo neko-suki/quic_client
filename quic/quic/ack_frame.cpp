@@ -12,8 +12,8 @@ std::vector<uint8_t> ACKFrame::GetBinary() {
 }
 
 void ACKFrame::Parse(std::vector<uint8_t> &buf, int &p) {
-  larget_acknowledged_ = parse_variable_length_integer(buf.data(), p);
-  // std::cout <<"largest_acknowledged:  " << larget_acknowledged_ <<
+  largeet_acknowledged_ = parse_variable_length_integer(buf.data(), p);
+  // std::cout <<"largest_acknowledged:  " << largeet_acknowledged_ <<
   // std::endl;
   ack_delay_ = parse_variable_length_integer(buf.data(), p);
   // std::cout <<"ack_delay: " << ack_delay_ << std::endl;
@@ -30,6 +30,10 @@ void ACKFrame::Parse(std::vector<uint8_t> &buf, int &p) {
     // std::cout <<"ack_range_length: " << ack_range.ack_range_length <<
     // std::endl;
   }
+}
+
+uint64_t ACKFrame::LargestAcknowledged(){
+  return largeet_acknowledged_;
 }
 
 } // namespace quic

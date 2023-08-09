@@ -12,6 +12,8 @@
 #include <cassert>
 #include <stdint.h>
 #include <vector>
+#include <optional>
+
 
 namespace quic {
 class VariableLengthInteger {
@@ -20,7 +22,10 @@ public:
   VariableLengthInteger(uint8_t a);
   VariableLengthInteger(uint64_t a);
   std::vector<uint8_t> GetBinary();
+  void SetNumBytes(int32_t num_bytes);
+
   uint64_t val_;
+  std::optional<int> num_bytes_;
 };
 } // namespace quic
 

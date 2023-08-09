@@ -22,6 +22,7 @@
 #include "quic/initial_packet.hpp"
 #include "quic/unprotect_packet.hpp"
 
+#include "quic/ack_frame.hpp"
 #include "quic/ack_manager.hpp"
 #include "quic/crypto_frame.hpp"
 #include "quic/handshake.hpp"
@@ -308,6 +309,7 @@ int main(int argc, char **argv) {
 
   quic::PacketNumberManager packet_number_manager;
   quic::ACKManager ack_manager;
+  std::optional<uint64_t> largest_ack_received;
 
   std::thread recv_thread([&] {
     while (true) {
@@ -332,12 +334,14 @@ int main(int argc, char **argv) {
         std::vector<std::unique_ptr<quic::QUICFrame>> frames =
             frame_parser.ParseAll(decoded_payload);
         for (int i = 0; i < frames.size(); i++) {
-          if (frames[i] && frames[i]->FrameType() ==
+          if (!frames[i]){
+            continue;
+          }
+          if (frames[i]->FrameType() ==
                                quic::QUICFrameType::HANDSHAKE_DONE) {
             handshake_done = true;
             cond.notify_one();
-          } else if (frames[i] &&
-                     (static_cast<int32_t>(frames[i]->FrameType()) &
+          } else if ((static_cast<int32_t>(frames[i]->FrameType()) &
                       static_cast<int32_t>(quic::QUICFrameType::STREAM)) ==
                          static_cast<int32_t>(
                              quic::QUICFrameType::STREAM)) {
@@ -349,12 +353,16 @@ int main(int argc, char **argv) {
               printf("%c", ch);
             }
             printf("\n");
+          } else if (static_cast<int32_t>(frames[i]->FrameType()) == static_cast<int32_t>(quic::QUICFrameType::ACK)){
+            printf("this is ack frame\n");
+            quic::ACKFrame *p = reinterpret_cast<quic::ACKFrame*>(frames[i].get());
+            largest_ack_received = p->LargestAcknowledged();
           }
         }
         ack_manager.AddACK(packet_info.packet_number);
         std::vector<uint8_t> ack_binary = ack_manager.GenFrameBinary();
         quic::OneRttPacket one_rtt_packet(
-            id_of_server, packet_number_manager.GetPacketNumber());
+            id_of_server, packet_number_manager.GetPacketNumber(), largest_ack_received);
         one_rtt_packet.AddFrame(ack_binary);
         std::vector<uint8_t> send_binary = one_rtt_packet.GetBinary(
             client_app_hp, client_app_key, client_app_iv);
@@ -381,7 +389,7 @@ int main(int argc, char **argv) {
       std::vector<uint8_t> stream_frame = stream.GetBinary();
 
       quic::OneRttPacket one_rtt_packet(
-          id_of_server, packet_number_manager.GetPacketNumber());
+          id_of_server, packet_number_manager.GetPacketNumber(), largest_ack_received);
       one_rtt_packet.AddFrame(stream_frame);
       std::vector<uint8_t> send_binary = one_rtt_packet.GetBinary(
           client_app_hp, client_app_key, client_app_iv);

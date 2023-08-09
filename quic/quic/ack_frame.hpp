@@ -19,7 +19,10 @@ public:
   ACKFrame();
   std::vector<uint8_t> GetBinary();
   void Parse(std::vector<uint8_t> &buf, int &p);
-  uint64_t larget_acknowledged_;
+  uint64_t LargestAcknowledged();
+
+private:
+  uint64_t largeet_acknowledged_;
   uint64_t ack_delay_;
   uint64_t ack_range_count_;
   uint64_t first_ack_range_;

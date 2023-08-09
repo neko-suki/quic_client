@@ -98,9 +98,12 @@ int PacketProtection::ProtectHeader(uint8_t header[], int header_sz,
                                     int protected_payload_sz,
                                     const uint8_t key[],
                                     int packet_number_offset) {
+  printf("Protected Header begin\n");
+  printf("header size: %d\n", header_sz);
+
   int header_type;
   int packet_number_length;
-  unsigned char sample[16];
+  unsigned char sample[16] = {0};
   int sample_sz = 16;
 
   if ((header[0] & 0x80) != 0) {
@@ -144,9 +147,8 @@ int PacketProtection::ProtectHeader(uint8_t header[], int header_sz,
     header[0] ^= out[0] & 0x1f;
   }
 
-  for (int i = packet_number_offset, mask = 1;
-       mask <= packet_number_length; i++, mask++) {
-    header[i] ^= out[mask];
+  for(int i = 0;i < packet_number_length;i++){
+    header[packet_number_offset + i] ^= out[1 + i];
   }
 
   EVP_CIPHER_CTX_free(evp);
