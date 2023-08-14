@@ -18,6 +18,8 @@
 #include "tls/key_schedule.hpp"
 #include "tls/supported_groups.hpp"
 
+#include "quic/api/connection.hpp"
+
 #include "quic/frame_parser.hpp"
 #include "quic/initial_packet.hpp"
 #include "quic/unprotect_packet.hpp"
@@ -49,49 +51,11 @@ void dump(std::vector<uint8_t> &data) {
 }
 
 int main(int argc, char **argv) {
-  /*
-  check hkdf extract
-  std::vector<uint8_t> salt = {
-      0x38,0x76,0x2c,0xf7,0xf5,0x59,0x34,0xb3,0x4d,0x17,0x9a,0xe6,0xa4,0xc8,0x0c,0xad,0xcc,0xbb,0x7f,0x0a
-  };
-  std::vector<uint8_t> ikm = {
-      0x83,0x94,0xc8,0xf0,0x3e,0x51,0x57,0x08
-  };
-  quic::HKDF hkdf;
-  std::vector<uint8_t> extracted = hkdf.Extract(32, salt, ikm);
-  std::vector<uint8_t> expect_extracted = {
-      0x7d,0xb5,0xdf,0x06,0xe7,0xa6,0x9e,0x43,0x24,0x96,0xad,0xed,0xb0,0x08,0x51,0x92,0x35,0x95,0x22,0x15,0x96,0xae,0x2a,0xe9,0xfb,0x81,0x15,0xc1,0xe9,0xed,0x0a,0x44
-  };
-  if (extracted == expect_extracted){
-      std::cout <<"hkdf.extract is valid" << std::endl;
-  } else {
-      std::cout <<"hkdf.extract is invalid" << std::endl;
-  }
-  */
-
-  // this should be argument
-  /*
-  {
-      //check key generation
-      tls::KeySchedule key_schedule;
-
-      std::vector<uint8_t> hello_hash = {
-          0xff,0x78,0x8f,0x9e,0xd0,0x9e,0x60,0xd8,0x14,0x2a,0xc1,0x0a,0x89,0x31,0xcd,0xb6,0xa3,0x72,0x62,0x78,0xd3,0xac,0xdb,0xa5,0x4d,0x9d,0x9f,0xfc,0x73,0x26,0x61,0x1b
-      };
-      // this should be argument
-      std::vector<uint8_t> shared_secret = {
-          0xdf,0x4a,0x29,0x1b,0xaa,0x1e,0xb7,0xcf,0xa6,0x93,0x4b,0x29,0xb4,0x74,0xba,0xad,0x26,0x97,0xe2,0x9f,0x1f,0x92,0x0d,0xcc,0x77,0xc8,0xa0,0xa0,0x88,0x44,0x76,0x24
-      };
-      key_schedule.ComputeHandshakeKey(32, hello_hash, shared_secret);
-
-      std::vector<uint8_t> handshake_hash = {
-          0xb9,0x65,0x18,0x5a,0xf5,0x03,0x4e,0xda,0x0e,0xa1,0x3a,0xb4,0x24,0xdd,0xe1,0x93,0xaf,0xcb,0x42,0x45,0x18,0x23,0xa9,0x69,0x21,0xae,0x9d,0x2d,0xad,0x95,0x94,0xef
-      };
-      key_schedule.ComputeApplicationKey(32, handshake_hash);
-  }
-  */
+  quic::api::Connection connection;
+  quic::Socket sock;
 
   printf("========== Send initial packet ==========\n");
+
   // SCID of client
   std::vector<uint8_t> id_of_client = {0x83, 0x94, 0xc8, 0xf0,
                                        0x3e, 0x51, 0x57, 0x09};
@@ -100,47 +64,19 @@ int main(int argc, char **argv) {
   std::vector<uint8_t> id_of_server = {0x83, 0x94, 0xc8, 0xf0,
                                        0x3e, 0x51, 0x57, 0x08};
 
-  // make initial packet
-  quic::InitialPacket initial_packet;
-  initial_packet.CreateInitialPacket(id_of_client, id_of_server);
-
   quic::InitialSecretGenerator initial_secret_generator;
-  initial_secret_generator.GenerateKey(id_of_server);
-  // initial_secret_generator.print();
-  initial_packet.Protect(initial_secret_generator);
-
-  std::vector<uint8_t> initial_packet_binary = initial_packet.GetBinary();
-  quic::Socket sock;
-  sock.Send(initial_packet_binary);
+  uint8_t packet[2048];
+  connection.Connect(initial_secret_generator, id_of_client, id_of_server, sock, packet);
 
   printf("========== Initial packet receive ==========\n");
-  uint8_t packet[2048];
-  const size_t packet_size = 2048;
-  ssize_t read_size = sock.RecvFrom(packet, packet_size);
-
-  // unprotect initial packet
-  quic::UnprotectPacket p;
-  // server initial key
-  std::vector<uint8_t> server_initial_hp_key =
-      initial_secret_generator.server_hp_key();
-  std::vector<uint8_t> server_initial_iv =
-      initial_secret_generator.server_iv();
-  std::vector<uint8_t> server_initial_key =
-      initial_secret_generator.server_key();
-
-  std::vector<uint8_t> header;
-  std::vector<uint8_t> decoded_payload;
-  struct quic::PacketInfo packet_info = p.Unprotect(
-      packet, packet_size, server_initial_hp_key, server_initial_iv,
-      server_initial_key, header, decoded_payload);
-  uint64_t initial_packet_number = packet_info.packet_number;
-
-  id_of_server =
-      packet_info.source_connection_id; // updated to choosed id by server
 
   quic::FrameParser frame_parser;
-  std::vector<std::unique_ptr<quic::QUICFrame>> initial_packet_response =
-      frame_parser.ParseAll(decoded_payload);
+
+  quic::PacketInfo packet_info = connection.GetPacketInfo();
+  id_of_server = packet_info.source_connection_id;
+
+  std::vector<std::unique_ptr<quic::QUICFrame>> initial_packet_response = connection.GetInitialPacketFrame();
+
   std::unique_ptr<quic::QUICFrame> server_hello_crypto_frame;
 
   for (int i = 0; i < initial_packet_response.size(); i++) {
@@ -157,6 +93,8 @@ int main(int argc, char **argv) {
 
   // parse handshake packet
   std::vector<uint8_t> server_key = crypto_frame->GetSharedKey();
+
+  quic::InitialPacket & initial_packet = connection.GetInitialPacket();
   tls::ECDH ecdh = initial_packet.GetECDH();
   ecdh.SetPeerPublicKey(server_key);
 
@@ -186,10 +124,15 @@ int main(int argc, char **argv) {
       key_schedule.GetServerHandshakeIV();
 
   int ptr = packet_info.tag_offset + AES_BLOCK_SIZE;
-  header.clear();
+  const size_t packet_size = 2048;
+  
+  std::vector<uint8_t> header;
+  quic::UnprotectPacket p;
+  std::vector<uint8_t> decoded_payload;
   packet_info = p.Unprotect(packet + ptr, packet_size, server_handshake_hp,
                             server_handshake_iv, server_handshake_key,
                             header, decoded_payload);
+  uint64_t initial_packet_number = packet_info.packet_number;
 
   std::unique_ptr<quic::CryptoFrame> crypto_frame_handshake;
   std::vector<std::unique_ptr<quic::QUICFrame>>
@@ -314,7 +257,7 @@ int main(int argc, char **argv) {
 
   std::thread recv_thread([&] {
     while (true) {
-      read_size = sock.RecvFrom(packet, packet_size);
+      ssize_t read_size = sock.RecvFrom(packet, packet_size);
       quic::PacketType packet_type = quic::GetPacketType(packet);
       if (quic::PacketType::Handshake == packet_type) {
         printf("========== Handshake Packet received ==========\n");
@@ -372,6 +315,7 @@ int main(int argc, char **argv) {
     }
   });
 
+/*
   std::thread ping_thread([&] {
     while (true) {
       quic::OneRttPacket one_rtt_packet(
@@ -385,6 +329,7 @@ int main(int argc, char **argv) {
       sleep(1);
     }
   });
+*/
 
   {
     std::unique_lock<std::mutex> lk(mtx);
@@ -412,7 +357,7 @@ int main(int argc, char **argv) {
     }
   }
 
-  ping_thread.join();
+  //ping_thread.join();
   recv_thread.join();
 
   sleep(10);
