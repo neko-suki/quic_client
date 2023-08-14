@@ -87,15 +87,15 @@ int main(int argc, char **argv) {
   std::vector<uint8_t> server_key = crypto_frame->GetSharedKey();
 
   quic::InitialPacket & initial_packet = connection.GetInitialPacket();
-  tls::ECDH ecdh = initial_packet.GetECDH();
+  tls::ECDH ecdh = initial_packet.GetECDH(); // should be in connection
   ecdh.SetPeerPublicKey(server_key);
 
-  std::vector<uint8_t> shared_secret = ecdh.GetSecret();
+  std::vector<uint8_t> shared_secret = ecdh.GetSecret(); // should be in connection
 
-  std::vector<uint8_t> client_hello_bin = initial_packet.GetClientHello();
-  std::vector<uint8_t> server_hello_bin = crypto_frame->GetServerHello();
+  std::vector<uint8_t> client_hello_bin = initial_packet.GetClientHello(); // should be used in main
+  std::vector<uint8_t> server_hello_bin = crypto_frame->GetServerHello(); // should be used in main
 
-  std::vector<uint8_t> hello_message(client_hello_bin);
+  std::vector<uint8_t> hello_message(client_hello_bin); // in connection
   std::copy(server_hello_bin.begin(), server_hello_bin.end(),
             std::back_inserter(hello_message));
 
@@ -106,6 +106,9 @@ int main(int argc, char **argv) {
 
   tls::KeySchedule key_schedule;
   key_schedule.ComputeHandshakeKey(hash_length, hello_hash, shared_secret);
+
+
+  // everything before here should be merged
 
   printf("========== Handshake packet received ==========\n");
   std::vector<uint8_t> server_handshake_hp =
