@@ -40,6 +40,10 @@ public:
     return decoded_payload_;
   }
 
+  std::unique_ptr<quic::QUICFrame> GetServerHelloCryptoFrame(){
+    return std::move(server_hello_crypto_frame_);
+  }
+
 private:
   void SendInitialPacket(InitialSecretGenerator & initial_secret_generator,
     quic::Socket & sock);
@@ -51,6 +55,7 @@ private:
   std::vector<std::unique_ptr<quic::QUICFrame>> initial_packet_response_;
   struct PacketInfo packet_info_;
   std::vector<uint8_t> decoded_payload_;
+  std::unique_ptr<quic::QUICFrame> server_hello_crypto_frame_;
 };
 
 } // api

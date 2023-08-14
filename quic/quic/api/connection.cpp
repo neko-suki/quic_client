@@ -64,6 +64,16 @@ void Connection::ReceiveInitialPacket(InitialSecretGenerator & initial_secret_ge
   quic::FrameParser frame_parser;
 
   initial_packet_response_ = frame_parser.ParseAll(decoded_payload_);
+
+  for (int i = 0; i < initial_packet_response_.size(); i++) {
+    if (initial_packet_response_[i]->FrameType() ==
+        quic::QUICFrameType::CRYPTO) {
+      server_hello_crypto_frame_ = std::move(initial_packet_response_[i]);
+      break;
+    }
+  }
+
+
 }
 
 

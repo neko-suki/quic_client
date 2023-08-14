@@ -77,15 +77,7 @@ int main(int argc, char **argv) {
 
   std::vector<std::unique_ptr<quic::QUICFrame>> initial_packet_response = connection.GetInitialPacketFrame();
 
-  std::unique_ptr<quic::QUICFrame> server_hello_crypto_frame;
-
-  for (int i = 0; i < initial_packet_response.size(); i++) {
-    if (initial_packet_response[i]->FrameType() ==
-        quic::QUICFrameType::CRYPTO) {
-      server_hello_crypto_frame = std::move(initial_packet_response[i]);
-      break;
-    }
-  }
+  std::unique_ptr<quic::QUICFrame> server_hello_crypto_frame = connection.GetServerHelloCryptoFrame();
 
   // read crypto_frame
   quic::CryptoFrame *crypto_frame = reinterpret_cast<quic::CryptoFrame *>(
