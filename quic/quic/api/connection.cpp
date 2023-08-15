@@ -20,6 +20,7 @@ void Connection::Connect(InitialSecretGenerator & initial_secret_generator,
   id_of_server_ = id_of_server;
   SendInitialPacket(initial_secret_generator, sock);
   ReceiveInitialPacket(initial_secret_generator, sock, packet);
+  ReceiveHandshakePacket(sock, packet);
 }
 
 void Connection::SendInitialPacket(InitialSecretGenerator & initial_secret_generator,
@@ -97,6 +98,29 @@ void Connection::ReceiveInitialPacket(InitialSecretGenerator & initial_secret_ge
   std::vector<uint8_t> hello_hash =
       hash.ComputeHash(hash_length, hello_message);
   key_schedule_.ComputeHandshakeKey(hash_length, hello_hash, shared_secret);
+}
+
+void Connection::ReceiveHandshakePacket(quic::Socket & sock, uint8_t packet[2048]){
+  printf("========== Handshake packet received ==========\n");
+  std::vector<uint8_t> server_handshake_hp =
+      key_schedule_.GetServerHandshakeHP();
+  std::vector<uint8_t> server_handshake_key =
+      key_schedule_.GetServerHandshakeKey();
+  std::vector<uint8_t> server_handshake_iv =
+      key_schedule_.GetServerHandshakeIV();
+  int ptr = packet_info_.tag_offset + AES_BLOCK_SIZE;
+  const size_t packet_size = 2048;
+  
+  std::vector<uint8_t> header;
+  quic::UnprotectPacket p;
+  std::vector<uint8_t> decoded_payload;
+  packet_info_ = p.Unprotect(packet + ptr, packet_size, server_handshake_hp,
+                            server_handshake_iv, server_handshake_key,
+                            header, decoded_payload);
+
+  quic::FrameParser frame_parser;
+  frame_in_handshake_packet_ = frame_parser.ParseAll(decoded_payload);
+
 }
 
 } // namespace api

@@ -68,50 +68,26 @@ int main(int argc, char **argv) {
   uint8_t packet[2048];
   connection.Connect(initial_secret_generator, id_of_client, id_of_server, sock, packet);
 
-  printf("========== Initial packet receive ==========\n");
-
-
-  quic::PacketInfo packet_info = connection.GetPacketInfo(); // keep in main
-  id_of_server = packet_info.source_connection_id; // keep in main
-
-
+  quic::PacketInfo packet_info = connection.GetPacketInfo();
+  id_of_server = packet_info.source_connection_id;
 
   quic::InitialPacket & initial_packet = connection.GetInitialPacket();
   std::vector<uint8_t> client_hello_bin = connection.GetClientHelloBin();
   std::vector<uint8_t> server_hello_bin = connection.GetServerHelloBin();  
 
 
-  // everything before here should be merged
   tls::Hash hash;
   size_t hash_length = 32;
-
   tls::KeySchedule key_schedule = connection.GetKeySchedule();
 
   printf("========== Handshake packet received ==========\n");
-  std::vector<uint8_t> server_handshake_hp =
-      key_schedule.GetServerHandshakeHP();
-  std::vector<uint8_t> server_handshake_key =
-      key_schedule.GetServerHandshakeKey();
-  std::vector<uint8_t> server_handshake_iv =
-      key_schedule.GetServerHandshakeIV();
-
-  int ptr = packet_info.tag_offset + AES_BLOCK_SIZE;
-  const size_t packet_size = 2048;
-  
-  std::vector<uint8_t> header;
-  quic::UnprotectPacket p;
-  std::vector<uint8_t> decoded_payload;
-  packet_info = p.Unprotect(packet + ptr, packet_size, server_handshake_hp,
-                            server_handshake_iv, server_handshake_key,
-                            header, decoded_payload);
   uint64_t initial_packet_number = packet_info.packet_number;
 
-  quic::FrameParser frame_parser;
-  std::unique_ptr<quic::CryptoFrame> crypto_frame_handshake;
-  std::vector<std::unique_ptr<quic::QUICFrame>>
-      handshake_packet_crypto_frame =
-          frame_parser.ParseAll(decoded_payload);
 
+
+  std::vector<std::unique_ptr<quic::QUICFrame>> handshake_packet_crypto_frame = connection.GetFrameInHandshakePacket();
+
+  std::unique_ptr<quic::CryptoFrame> crypto_frame_handshake;
   for (int i = 0; i < handshake_packet_crypto_frame.size(); i++) {
     if (handshake_packet_crypto_frame[i]->FrameType() ==
         quic::QUICFrameType::CRYPTO) {
@@ -158,6 +134,7 @@ int main(int argc, char **argv) {
   std::vector<uint8_t> initial_ack_binary = initial_packet.GetBinary();
   printf("========== Send initial ack ==========\n");
   sock.Send(initial_ack_binary);
+
 
   // send Handshake packet
   std::vector<uint8_t> finished_key = key_schedule.GetFinishedKey();
@@ -229,25 +206,37 @@ int main(int argc, char **argv) {
   std::optional<uint64_t> largest_ack_received;
 
   std::thread recv_thread([&] {
+    std::vector<uint8_t> server_handshake_hp =
+      key_schedule.GetServerHandshakeHP();
+    std::vector<uint8_t> server_handshake_key =
+      key_schedule.GetServerHandshakeKey();
+    std::vector<uint8_t> server_handshake_iv =
+      key_schedule.GetServerHandshakeIV();
     while (true) {
+      const size_t packet_size = 2048;
       ssize_t read_size = sock.RecvFrom(packet, packet_size);
       quic::PacketType packet_type = quic::GetPacketType(packet);
       if (quic::PacketType::Handshake == packet_type) {
         printf("========== Handshake Packet received ==========\n");
-        header.clear();
+        std::vector<uint8_t> header;
+        quic::UnprotectPacket p;
+        std::vector<uint8_t> decoded_payload;
         packet_info = p.Unprotect(
             packet, read_size, server_handshake_hp, server_handshake_iv,
             server_handshake_key, header, decoded_payload);
-        ptr = packet_info.tag_offset + AES_BLOCK_SIZE;
-
+        int ptr = packet_info.tag_offset + AES_BLOCK_SIZE;
+        quic::FrameParser frame_parser;
         frame_parser.ParseAll(decoded_payload);
         printf("========== Parse Handshake Packet ACK end ==========\n");
       } else {
         printf("========== 1-RTT packet received ==========\n");
-        header.clear();
+        std::vector<uint8_t> header;
+        quic::UnprotectPacket p;
+        std::vector<uint8_t> decoded_payload;
         packet_info = p.Unprotect(packet, read_size, server_app_hp,
                                   server_app_iv, server_app_key, header,
                                   decoded_payload, id_of_client);
+        quic::FrameParser frame_parser;
         std::vector<std::unique_ptr<quic::QUICFrame>> frames =
             frame_parser.ParseAll(decoded_payload);
         for (int i = 0; i < frames.size(); i++) {

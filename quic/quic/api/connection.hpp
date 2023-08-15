@@ -51,10 +51,15 @@ public:
     return key_schedule_;
   }
 
+  std::vector<std::unique_ptr<quic::QUICFrame>> GetFrameInHandshakePacket(){
+    return std::move(frame_in_handshake_packet_);
+  }
+
 private:
   void SendInitialPacket(InitialSecretGenerator & initial_secret_generator,
     quic::Socket & sock);
   void ReceiveInitialPacket(InitialSecretGenerator & initial_secret_generator, quic::Socket & sock, uint8_t packet[2048]);
+  void ReceiveHandshakePacket(quic::Socket & sock, uint8_t packet[2048]);
 
   InitialPacket initial_packet_;
   std::vector<uint8_t> id_of_client_;
@@ -66,6 +71,7 @@ private:
   std::vector<uint8_t> client_hello_bin_;
   std::vector<uint8_t> server_hello_bin_;
   tls::KeySchedule key_schedule_;
+  std::vector<std::unique_ptr<quic::QUICFrame>> frame_in_handshake_packet_;
 };
 
 } // api
