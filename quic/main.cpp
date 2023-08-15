@@ -80,14 +80,7 @@ int main(int argc, char **argv) {
   uint64_t initial_packet_number = packet_info.packet_number;
   std::unique_ptr<quic::CryptoFrame> crypto_frame_handshake = connection.GetCryptoFrameHandshake();
 
-  // send Initial ACK
-  initial_packet.CreateAckPacket(id_of_client, id_of_server,
-                                 initial_packet_number);
-  initial_packet.Protect(initial_secret_generator);
 
-  std::vector<uint8_t> initial_ack_binary = initial_packet.GetBinary();
-  printf("========== Send initial ack ==========\n");
-  sock.Send(initial_ack_binary);
 
 
   // send Handshake packet

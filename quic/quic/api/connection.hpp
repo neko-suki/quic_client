@@ -60,6 +60,7 @@ private:
     quic::Socket & sock);
   void ReceiveInitialPacket(InitialSecretGenerator & initial_secret_generator, quic::Socket & sock, uint8_t packet[2048]);
   void ReceiveHandshakePacket(quic::Socket & sock, uint8_t packet[2048]);
+  void SendInitialAck(InitialSecretGenerator & initial_secret_generator, quic::Socket & sock);
 
   InitialPacket initial_packet_;
   std::vector<uint8_t> id_of_client_;
