@@ -38,6 +38,7 @@ quic/tls/server_name.cpp
 quic/tls/server_hello.cpp
 quic/tls/quic_transport_parameter.cpp
 
+quic/quic/api/connection.cpp
 quic/quic/ack_frame.cpp
 quic/quic/ack_manager.cpp
 quic/quic/crypto_frame.cpp
