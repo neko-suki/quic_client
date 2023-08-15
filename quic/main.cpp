@@ -75,56 +75,10 @@ int main(int argc, char **argv) {
   std::vector<uint8_t> client_hello_bin = connection.GetClientHelloBin();
   std::vector<uint8_t> server_hello_bin = connection.GetServerHelloBin();  
 
-
   tls::Hash hash;
   size_t hash_length = 32;
-  tls::KeySchedule key_schedule = connection.GetKeySchedule();
-
-  printf("========== Handshake packet received ==========\n");
   uint64_t initial_packet_number = packet_info.packet_number;
-
-
-
-  std::vector<std::unique_ptr<quic::QUICFrame>> handshake_packet_crypto_frame = connection.GetFrameInHandshakePacket();
-
-  std::unique_ptr<quic::CryptoFrame> crypto_frame_handshake;
-  for (int i = 0; i < handshake_packet_crypto_frame.size(); i++) {
-    if (handshake_packet_crypto_frame[i]->FrameType() ==
-        quic::QUICFrameType::CRYPTO) {
-      crypto_frame_handshake = std::unique_ptr<quic::CryptoFrame>(
-          dynamic_cast<quic::CryptoFrame *>(
-              handshake_packet_crypto_frame[i].release()));
-      break;
-    }
-  }
-
-  // verify data
-  {
-    std::vector<uint8_t> merged_handshake = client_hello_bin;
-    std::copy(server_hello_bin.begin(), server_hello_bin.end(),
-              std::back_inserter(merged_handshake));
-    std::vector<uint8_t> handshake_server_hello =
-        crypto_frame_handshake->GetServerHandshakeBinaryWithoutFinished();
-    std::copy(handshake_server_hello.begin(), handshake_server_hello.end(),
-              std::back_inserter(merged_handshake));
-
-    std::vector<uint8_t> finished_hash =
-        hash.ComputeHash(hash_length, merged_handshake);
-
-    tls::HMAC hmac;
-    std::vector<uint8_t> server_finished_key =
-        key_schedule.GetServerFinishedKey();
-    std::vector<uint8_t> verify_data =
-        hmac.ComputeHMAC(finished_hash, server_finished_key);
-
-    std::vector<uint8_t> server_verify_data =
-        crypto_frame_handshake->GetVerifyData();
-
-    if (server_verify_data != verify_data) {
-      printf("Failed verify\n");
-      std::exit(1);
-    }
-  }
+  std::unique_ptr<quic::CryptoFrame> crypto_frame_handshake = connection.GetCryptoFrameHandshake();
 
   // send Initial ACK
   initial_packet.CreateAckPacket(id_of_client, id_of_server,
@@ -137,6 +91,7 @@ int main(int argc, char **argv) {
 
 
   // send Handshake packet
+  tls::KeySchedule key_schedule = connection.GetKeySchedule();
   std::vector<uint8_t> finished_key = key_schedule.GetFinishedKey();
 
   std::vector<uint8_t> merged_handshake = client_hello_bin;

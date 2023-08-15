@@ -6,6 +6,7 @@
 #include "../../quic/unprotect_packet.hpp"
 #include "../../quic/initial_packet.hpp"
 #include "../../quic/initial_secret_generator.hpp"
+#include "../../tls/hmac.hpp"
 
 namespace quic {
 namespace api{
@@ -119,7 +120,47 @@ void Connection::ReceiveHandshakePacket(quic::Socket & sock, uint8_t packet[2048
                             header, decoded_payload);
 
   quic::FrameParser frame_parser;
-  frame_in_handshake_packet_ = frame_parser.ParseAll(decoded_payload);
+  std::vector<std::unique_ptr<quic::QUICFrame>> handshake_packet_crypto_frame = frame_parser.ParseAll(decoded_payload);
+  
+  for (int i = 0; i < handshake_packet_crypto_frame.size(); i++) {
+    if (handshake_packet_crypto_frame[i]->FrameType() ==
+        quic::QUICFrameType::CRYPTO) {
+      crypto_frame_handshake_ = std::unique_ptr<quic::CryptoFrame>(
+          dynamic_cast<quic::CryptoFrame *>(
+              handshake_packet_crypto_frame[i].release()));
+      break;
+    }
+  }
+
+  // verify data
+  {
+    std::vector<uint8_t> merged_handshake = client_hello_bin_;
+    std::copy(server_hello_bin_.begin(), server_hello_bin_.end(),
+              std::back_inserter(merged_handshake));
+    std::vector<uint8_t> handshake_server_hello =
+        crypto_frame_handshake_->GetServerHandshakeBinaryWithoutFinished();
+    std::copy(handshake_server_hello.begin(), handshake_server_hello.end(),
+              std::back_inserter(merged_handshake));
+
+    tls::Hash hash;
+    size_t hash_length = 32;
+    std::vector<uint8_t> finished_hash =
+        hash.ComputeHash(hash_length, merged_handshake);
+
+    tls::HMAC hmac;
+    std::vector<uint8_t> server_finished_key =
+        key_schedule_.GetServerFinishedKey();
+    std::vector<uint8_t> verify_data =
+        hmac.ComputeHMAC(finished_hash, server_finished_key);
+
+    std::vector<uint8_t> server_verify_data =
+        crypto_frame_handshake_->GetVerifyData();
+
+    if (server_verify_data != verify_data) {
+      printf("Failed verify\n");
+      std::exit(1);
+    }
+  }
 
 }
 

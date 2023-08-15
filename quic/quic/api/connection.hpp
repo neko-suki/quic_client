@@ -51,8 +51,8 @@ public:
     return key_schedule_;
   }
 
-  std::vector<std::unique_ptr<quic::QUICFrame>> GetFrameInHandshakePacket(){
-    return std::move(frame_in_handshake_packet_);
+  std::unique_ptr<quic::CryptoFrame> GetCryptoFrameHandshake(){
+    return std::move(crypto_frame_handshake_);
   }
 
 private:
@@ -72,6 +72,7 @@ private:
   std::vector<uint8_t> server_hello_bin_;
   tls::KeySchedule key_schedule_;
   std::vector<std::unique_ptr<quic::QUICFrame>> frame_in_handshake_packet_;
+  std::unique_ptr<quic::CryptoFrame> crypto_frame_handshake_;
 };
 
 } // api
