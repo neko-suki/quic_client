@@ -8,6 +8,7 @@
 #include "../../quic/initial_secret_generator.hpp"
 #include "../../quic/parse_common.hpp"
 #include "../../quic/socket.hpp"
+#include "../../tls/key_schedule.hpp"
 
 namespace quic {
 namespace api{
@@ -28,10 +29,6 @@ public:
     return initial_packet_;
   }
 
-  std::vector<std::unique_ptr<quic::QUICFrame>> GetInitialPacketFrame(){
-    return std::move(initial_packet_response_);
-  }
-
   struct PacketInfo GetPacketInfo(){
     return packet_info_;
   }
@@ -42,6 +39,16 @@ public:
 
   std::unique_ptr<quic::QUICFrame> GetServerHelloCryptoFrame(){
     return std::move(server_hello_crypto_frame_);
+  }
+  std::vector<uint8_t> GetClientHelloBin(){
+    return client_hello_bin_;
+  }
+  std::vector<uint8_t> GetServerHelloBin(){
+    return server_hello_bin_;
+  }
+
+  tls::KeySchedule & GetKeySchedule(){
+    return key_schedule_;
   }
 
 private:
@@ -56,6 +63,9 @@ private:
   struct PacketInfo packet_info_;
   std::vector<uint8_t> decoded_payload_;
   std::unique_ptr<quic::QUICFrame> server_hello_crypto_frame_;
+  std::vector<uint8_t> client_hello_bin_;
+  std::vector<uint8_t> server_hello_bin_;
+  tls::KeySchedule key_schedule_;
 };
 
 } // api

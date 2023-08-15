@@ -70,45 +70,22 @@ int main(int argc, char **argv) {
 
   printf("========== Initial packet receive ==========\n");
 
-  quic::FrameParser frame_parser;
 
-  quic::PacketInfo packet_info = connection.GetPacketInfo();
-  id_of_server = packet_info.source_connection_id;
+  quic::PacketInfo packet_info = connection.GetPacketInfo(); // keep in main
+  id_of_server = packet_info.source_connection_id; // keep in main
 
-  std::vector<std::unique_ptr<quic::QUICFrame>> initial_packet_response = connection.GetInitialPacketFrame();
 
-  std::unique_ptr<quic::QUICFrame> server_hello_crypto_frame = connection.GetServerHelloCryptoFrame();
-
-  // read crypto_frame
-  quic::CryptoFrame *crypto_frame = reinterpret_cast<quic::CryptoFrame *>(
-      server_hello_crypto_frame.get());
-
-  // parse handshake packet
-  std::vector<uint8_t> server_key = crypto_frame->GetSharedKey();
 
   quic::InitialPacket & initial_packet = connection.GetInitialPacket();
-  tls::ECDH ecdh = initial_packet.GetECDH(); // should be in connection
-  ecdh.SetPeerPublicKey(server_key);
-
-  std::vector<uint8_t> shared_secret = ecdh.GetSecret(); // should be in connection
-
-  std::vector<uint8_t> client_hello_bin = initial_packet.GetClientHello(); // should be used in main
-  std::vector<uint8_t> server_hello_bin = crypto_frame->GetServerHello(); // should be used in main
-
-  std::vector<uint8_t> hello_message(client_hello_bin); // in connection
-  std::copy(server_hello_bin.begin(), server_hello_bin.end(),
-            std::back_inserter(hello_message));
-
-  tls::Hash hash;
-  size_t hash_length = 32;
-  std::vector<uint8_t> hello_hash =
-      hash.ComputeHash(hash_length, hello_message);
-
-  tls::KeySchedule key_schedule;
-  key_schedule.ComputeHandshakeKey(hash_length, hello_hash, shared_secret);
+  std::vector<uint8_t> client_hello_bin = connection.GetClientHelloBin();
+  std::vector<uint8_t> server_hello_bin = connection.GetServerHelloBin();  
 
 
   // everything before here should be merged
+  tls::Hash hash;
+  size_t hash_length = 32;
+
+  tls::KeySchedule key_schedule = connection.GetKeySchedule();
 
   printf("========== Handshake packet received ==========\n");
   std::vector<uint8_t> server_handshake_hp =
@@ -129,6 +106,7 @@ int main(int argc, char **argv) {
                             header, decoded_payload);
   uint64_t initial_packet_number = packet_info.packet_number;
 
+  quic::FrameParser frame_parser;
   std::unique_ptr<quic::CryptoFrame> crypto_frame_handshake;
   std::vector<std::unique_ptr<quic::QUICFrame>>
       handshake_packet_crypto_frame =

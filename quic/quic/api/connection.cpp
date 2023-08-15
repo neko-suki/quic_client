@@ -73,9 +73,31 @@ void Connection::ReceiveInitialPacket(InitialSecretGenerator & initial_secret_ge
     }
   }
 
+  // read crypto_frame
+  quic::CryptoFrame *crypto_frame = reinterpret_cast<quic::CryptoFrame *>(
+      server_hello_crypto_frame_.get());
 
+  // parse handshake packet
+  std::vector<uint8_t> server_key = crypto_frame->GetSharedKey(); // should be in connection
+
+  tls::ECDH ecdh = initial_packet_.GetECDH(); // should be in connection
+  ecdh.SetPeerPublicKey(server_key);
+
+  std::vector<uint8_t> shared_secret = ecdh.GetSecret(); // should be in connection
+
+  client_hello_bin_ = initial_packet_.GetClientHello(); // should be used in main
+  server_hello_bin_ = crypto_frame->GetServerHello(); // should be used in main
+
+  std::vector<uint8_t> hello_message(client_hello_bin_); // in connection
+  std::copy(server_hello_bin_.begin(), server_hello_bin_.end(),
+            std::back_inserter(hello_message));
+
+  tls::Hash hash;
+  size_t hash_length = 32;
+  std::vector<uint8_t> hello_hash =
+      hash.ComputeHash(hash_length, hello_message);
+  key_schedule_.ComputeHandshakeKey(hash_length, hello_hash, shared_secret);
 }
-
 
 } // namespace api
 } // namespace quic
