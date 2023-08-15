@@ -17,29 +17,17 @@ public:
   Connection() = default;
 
   // return vector<uint8_t> is temporary
-  void Connect(InitialSecretGenerator & initial_secret_generator, 
-    std::vector<uint8_t> & id_of_client,
+  void Connect(std::vector<uint8_t> & id_of_client,
     std::vector<uint8_t> & id_of_server,
     quic::Socket & sock,
     uint8_t packet[2048]
   );
 
   // temporarl API
-  InitialPacket & GetInitialPacket(){
-    return initial_packet_;
-  }
-
   struct PacketInfo GetPacketInfo(){
     return packet_info_;
   }
 
-  std::vector<uint8_t> & GetDecodedPayload(){
-    return decoded_payload_;
-  }
-
-  std::unique_ptr<quic::QUICFrame> GetServerHelloCryptoFrame(){
-    return std::move(server_hello_crypto_frame_);
-  }
   std::vector<uint8_t> GetClientHelloBin(){
     return client_hello_bin_;
   }
@@ -56,18 +44,20 @@ public:
   }
 
 private:
-  void SendInitialPacket(InitialSecretGenerator & initial_secret_generator,
-    quic::Socket & sock);
-  void ReceiveInitialPacket(InitialSecretGenerator & initial_secret_generator, quic::Socket & sock, uint8_t packet[2048]);
+  void SendInitialPacket(quic::Socket & sock);
+  void ReceiveInitialPacket(quic::Socket & sock, uint8_t packet[2048]);
   void ReceiveHandshakePacket(quic::Socket & sock, uint8_t packet[2048]);
-  void SendInitialAck(InitialSecretGenerator & initial_secret_generator, quic::Socket & sock);
+  void SendInitialAck(quic::Socket & sock);
 
+  InitialSecretGenerator initial_secret_generator_;
+  std::vector<uint8_t> decoded_payload_;
   InitialPacket initial_packet_;
+
+  // return to main
   std::vector<uint8_t> id_of_client_;
   std::vector<uint8_t> id_of_server_;
   std::vector<std::unique_ptr<quic::QUICFrame>> initial_packet_response_;
   struct PacketInfo packet_info_;
-  std::vector<uint8_t> decoded_payload_;
   std::unique_ptr<quic::QUICFrame> server_hello_crypto_frame_;
   std::vector<uint8_t> client_hello_bin_;
   std::vector<uint8_t> server_hello_bin_;

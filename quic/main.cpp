@@ -28,7 +28,6 @@
 #include "quic/ack_manager.hpp"
 #include "quic/crypto_frame.hpp"
 #include "quic/handshake.hpp"
-#include "quic/initial_secret_generator.hpp"
 #include "quic/one_rtt_packet.hpp"
 #include "quic/packet_number_manager.hpp"
 #include "quic/quic_frame.hpp"
@@ -63,21 +62,17 @@ int main(int argc, char **argv) {
   // id_of_server = DCID Of client
   std::vector<uint8_t> id_of_server = {0x83, 0x94, 0xc8, 0xf0,
                                        0x3e, 0x51, 0x57, 0x08};
-
-  quic::InitialSecretGenerator initial_secret_generator;
   uint8_t packet[2048];
-  connection.Connect(initial_secret_generator, id_of_client, id_of_server, sock, packet);
+  connection.Connect(id_of_client, id_of_server, sock, packet);
 
   quic::PacketInfo packet_info = connection.GetPacketInfo();
   id_of_server = packet_info.source_connection_id;
 
-  quic::InitialPacket & initial_packet = connection.GetInitialPacket();
   std::vector<uint8_t> client_hello_bin = connection.GetClientHelloBin();
   std::vector<uint8_t> server_hello_bin = connection.GetServerHelloBin();  
 
   tls::Hash hash;
   size_t hash_length = 32;
-  uint64_t initial_packet_number = packet_info.packet_number;
   std::unique_ptr<quic::CryptoFrame> crypto_frame_handshake = connection.GetCryptoFrameHandshake();
 
 
