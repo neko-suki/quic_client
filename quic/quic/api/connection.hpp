@@ -43,11 +43,16 @@ public:
     return std::move(crypto_frame_handshake_);
   }
 
+  std::vector<uint8_t> GetFinishedHash(){
+    return finished_hash_;
+  }
+
 private:
   void SendInitialPacket(quic::Socket & sock);
   void ReceiveInitialPacket(quic::Socket & sock, uint8_t packet[2048]);
   void ReceiveHandshakePacket(quic::Socket & sock, uint8_t packet[2048]);
   void SendInitialAck(quic::Socket & sock);
+  void SendHandshakePacket(quic::Socket & sock);
 
   InitialSecretGenerator initial_secret_generator_;
   std::vector<uint8_t> decoded_payload_;
@@ -64,6 +69,8 @@ private:
   tls::KeySchedule key_schedule_;
   std::vector<std::unique_ptr<quic::QUICFrame>> frame_in_handshake_packet_;
   std::unique_ptr<quic::CryptoFrame> crypto_frame_handshake_;
+  std::vector<uint8_t> finished_hash_;
+
 };
 
 } // api

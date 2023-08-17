@@ -53,8 +53,6 @@ int main(int argc, char **argv) {
   quic::api::Connection connection;
   quic::Socket sock;
 
-  printf("========== Send initial packet ==========\n");
-
   // SCID of client
   std::vector<uint8_t> id_of_client = {0x83, 0x94, 0xc8, 0xf0,
                                        0x3e, 0x51, 0x57, 0x09};
@@ -71,61 +69,13 @@ int main(int argc, char **argv) {
   std::vector<uint8_t> client_hello_bin = connection.GetClientHelloBin();
   std::vector<uint8_t> server_hello_bin = connection.GetServerHelloBin();  
 
-  tls::Hash hash;
-  size_t hash_length = 32;
   std::unique_ptr<quic::CryptoFrame> crypto_frame_handshake = connection.GetCryptoFrameHandshake();
 
-
-
-
-  // send Handshake packet
   tls::KeySchedule key_schedule = connection.GetKeySchedule();
-  std::vector<uint8_t> finished_key = key_schedule.GetFinishedKey();
-
-  std::vector<uint8_t> merged_handshake = client_hello_bin;
-  std::copy(server_hello_bin.begin(), server_hello_bin.end(),
-            std::back_inserter(merged_handshake));
-  std::vector<uint8_t> server_handshake =
-      crypto_frame_handshake->GetServerHandshakeBinary();
-  std::copy(server_handshake.begin(),
-            server_handshake.end(),
-            std::back_inserter(merged_handshake));
-
-
- for(int i = 0;i < server_hello_bin.size();i++)printf("%02x", server_hello_bin[i]);
- printf("\n");
-
- for(int i = 0;i < server_handshake.size();i++)printf("%02x", server_handshake[i]);
- printf("\n");
-
-
-  std::vector<uint8_t> finished_hash =
-      hash.ComputeHash(hash_length, merged_handshake);
-
-  tls::HMAC hmac;
-  std::vector<uint8_t> verify_data =
-      hmac.ComputeHMAC(finished_hash, finished_key);
-
-  // generate handshake packet
-  quic::Handshake handshake;
-  handshake.CreateClientHandshake(id_of_client, id_of_server, verify_data,
-                                  packet_info.packet_number);
-
-  std::vector<uint8_t> client_handshake_hp =
-      key_schedule.GetClientHandshakeHP();
-  std::vector<uint8_t> client_handshake_key =
-      key_schedule.GetClientHandshakeKey();
-  std::vector<uint8_t> client_handshake_iv =
-      key_schedule.GetClientHandshakeIV();
-  handshake.Protect(client_handshake_key, client_handshake_iv,
-                    client_handshake_hp);
-
-  std::vector<uint8_t> handshake_binary = handshake.GetBinary();
-  printf("========== Send handshake finished and ack ==========\n");
-  sock.Send(handshake_binary);
 
   printf("========== Application Packet ==========\n");
-
+  size_t hash_length = 32;
+  std::vector<uint8_t> finished_hash = connection.GetFinishedHash();
   key_schedule.ComputeApplicationKey(hash_length, finished_hash);
   key_schedule.DumpKeylog();
 
