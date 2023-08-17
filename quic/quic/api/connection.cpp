@@ -3,8 +3,9 @@
 #include <cstdio>
 
 #include "../../quic/frame_parser.hpp"
-#include "../../quic/unprotect_packet.hpp"
+#include "../../quic/handshake.hpp"
 #include "../../quic/initial_packet.hpp"
+#include "../../quic/unprotect_packet.hpp"
 #include "../../tls/hmac.hpp"
 
 namespace quic {
@@ -22,6 +23,7 @@ void Connection::Connect(
   ReceiveInitialPacket(sock, packet);
   ReceiveHandshakePacket(sock, packet);
   SendInitialAck(sock);
+  SendHandshakePacket(sock);
 }
 
 void Connection::SendInitialPacket(
@@ -173,6 +175,48 @@ void Connection::SendInitialAck(quic::Socket & sock){
   std::vector<uint8_t> initial_ack_binary = initial_packet_.GetBinary();
   printf("========== Send initial ack ==========\n");
   sock.Send(initial_ack_binary);
+}
+
+void Connection::SendHandshakePacket(quic::Socket & sock){
+  tls::Hash hash;
+  size_t hash_length = 32;
+
+  // send Handshake packet
+  std::vector<uint8_t> finished_key = key_schedule_.GetFinishedKey();
+
+  std::vector<uint8_t> merged_handshake = client_hello_bin_;
+  std::copy(server_hello_bin_.begin(), server_hello_bin_.end(),
+            std::back_inserter(merged_handshake));
+  std::vector<uint8_t> server_handshake =
+      crypto_frame_handshake_->GetServerHandshakeBinary();
+  std::copy(server_handshake.begin(),
+            server_handshake.end(),
+            std::back_inserter(merged_handshake));
+
+  finished_hash_ =
+      hash.ComputeHash(hash_length, merged_handshake);
+
+  tls::HMAC hmac;
+  std::vector<uint8_t> verify_data =
+      hmac.ComputeHMAC(finished_hash_, finished_key);
+
+  // generate handshake packet
+  quic::Handshake handshake;
+  handshake.CreateClientHandshake(id_of_client_, id_of_server_, verify_data,
+                                  packet_info_.packet_number);
+
+  std::vector<uint8_t> client_handshake_hp =
+      key_schedule_.GetClientHandshakeHP();
+  std::vector<uint8_t> client_handshake_key =
+      key_schedule_.GetClientHandshakeKey();
+  std::vector<uint8_t> client_handshake_iv =
+      key_schedule_.GetClientHandshakeIV();
+  handshake.Protect(client_handshake_key, client_handshake_iv,
+                    client_handshake_hp);
+
+  std::vector<uint8_t> handshake_binary = handshake.GetBinary();
+  printf("========== Send handshake finished and ack ==========\n");
+  sock.Send(handshake_binary);
 }
 
 } // namespace api

@@ -66,11 +66,6 @@ int main(int argc, char **argv) {
   quic::PacketInfo packet_info = connection.GetPacketInfo();
   id_of_server = packet_info.source_connection_id;
 
-  std::vector<uint8_t> client_hello_bin = connection.GetClientHelloBin();
-  std::vector<uint8_t> server_hello_bin = connection.GetServerHelloBin();  
-
-  std::unique_ptr<quic::CryptoFrame> crypto_frame_handshake = connection.GetCryptoFrameHandshake();
-
   tls::KeySchedule key_schedule = connection.GetKeySchedule();
 
   printf("========== Application Packet ==========\n");
@@ -109,12 +104,13 @@ int main(int argc, char **argv) {
       const size_t packet_size = 2048;
       ssize_t read_size = sock.RecvFrom(packet, packet_size);
       quic::PacketType packet_type = quic::GetPacketType(packet);
+      quic::PacketInfo packet_info;
       if (quic::PacketType::Handshake == packet_type) {
         printf("========== Handshake Packet received ==========\n");
         std::vector<uint8_t> header;
         quic::UnprotectPacket p;
         std::vector<uint8_t> decoded_payload;
-        packet_info = p.Unprotect(
+        quic::PacketInfo packet_info = p.Unprotect(
             packet, read_size, server_handshake_hp, server_handshake_iv,
             server_handshake_key, header, decoded_payload);
         int ptr = packet_info.tag_offset + AES_BLOCK_SIZE;
