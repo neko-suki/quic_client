@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
   quic::PacketInfo packet_info = connection.GetPacketInfo();
   id_of_server = packet_info.source_connection_id;
 
-  tls::KeySchedule key_schedule = connection.GetKeySchedule();
+  tls::KeySchedule & key_schedule = connection.GetKeySchedule();
 
   printf("========== Application Packet ==========\n");
   size_t hash_length = 32;
@@ -88,7 +88,6 @@ int main(int argc, char **argv) {
   std::mutex mtx;
   bool handshake_done = false;
 
-  quic::PacketNumberManager packet_number_manager;
   quic::ACKManager ack_manager;
   // TODO: need lock?
   std::optional<uint64_t> largest_ack_received;
@@ -157,7 +156,7 @@ int main(int argc, char **argv) {
         ack_manager.AddACK(packet_info.packet_number);
         std::vector<uint8_t> ack_binary = ack_manager.GenFrameBinary();
         quic::OneRttPacket one_rtt_packet(
-            id_of_server, packet_number_manager.GetPacketNumber(), largest_ack_received);
+            id_of_server, connection.GetPacketNumber(), largest_ack_received);
         one_rtt_packet.AddFrame(ack_binary);
         std::vector<uint8_t> send_binary = one_rtt_packet.GetBinary(
             client_app_hp, client_app_key, client_app_iv);
@@ -170,7 +169,7 @@ int main(int argc, char **argv) {
   std::thread ping_thread([&] {
     while (true) {
       quic::OneRttPacket one_rtt_packet(
-          id_of_server, packet_number_manager.GetPacketNumber(), largest_ack_received);
+          id_of_server, connection.GetPacketNumber(), largest_ack_received);
       std::vector<uint8_t> ping_Frame(1,0x01);
       one_rtt_packet.AddFrame(ping_Frame);
       std::vector<uint8_t> send_binary = one_rtt_packet.GetBinary(
@@ -193,19 +192,10 @@ int main(int argc, char **argv) {
       if (input.size() == 0)
         continue;
       printf("echo input: %s\n", input.c_str());
-      int64_t stream_id = connection.GetNextAvailableStreamID();
-      quic::StreamFrame stream =
-          stream_manager.CreateClientInitiatedBidirectionalStream();
-      stream.AddPayload(input);
-      stream.SetFin();
-      std::vector<uint8_t> stream_frame = stream.GetBinary();
 
-      quic::OneRttPacket one_rtt_packet(
-          id_of_server, packet_number_manager.GetPacketNumber(), largest_ack_received);
-      one_rtt_packet.AddFrame(stream_frame);
-      std::vector<uint8_t> send_binary = one_rtt_packet.GetBinary(
-          client_app_hp, client_app_key, client_app_iv);
-      sock.Send(send_binary);
+      int64_t stream_id = connection.GetNextAvailableStreamID();
+      std::vector<uint8_t> data(input.begin(), input.end());
+      connection.SendStreamData(stream_id, data, sock, largest_ack_received);
     }
   }
 
