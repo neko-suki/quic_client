@@ -193,6 +193,7 @@ int main(int argc, char **argv) {
       if (input.size() == 0)
         continue;
       printf("echo input: %s\n", input.c_str());
+      int64_t stream_id = connection.GetNextAvailableStreamID();
       quic::StreamFrame stream =
           stream_manager.CreateClientInitiatedBidirectionalStream();
       stream.AddPayload(input);

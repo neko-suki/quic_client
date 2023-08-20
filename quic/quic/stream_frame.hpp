@@ -17,6 +17,8 @@ public:
   std::vector<uint8_t> GetBinary();
   void Parse(std::vector<uint8_t> &buf, int &p);
   std::vector<uint8_t> stream_data();
+  uint64_t GetStreamID();
+  void AddPayload(std::vector<uint8_t> & in);
 
 private:
   uint64_t stream_id_;

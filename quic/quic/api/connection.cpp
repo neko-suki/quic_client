@@ -5,6 +5,7 @@
 #include "../../quic/frame_parser.hpp"
 #include "../../quic/handshake.hpp"
 #include "../../quic/initial_packet.hpp"
+#include "../../quic/one_rtt_packet.hpp"
 #include "../../quic/unprotect_packet.hpp"
 #include "../../tls/hmac.hpp"
 
@@ -218,6 +219,32 @@ void Connection::SendHandshakePacket(quic::Socket & sock){
   printf("========== Send handshake finished and ack ==========\n");
   sock.Send(handshake_binary);
 }
+
+uint64_t Connection::GetNextAvailableStreamID(bool is_unidirectional){
+  quic::StreamFrame stream =
+          stream_manager_.CreateClientInitiatedBidirectionalStream();
+  uint64_t stream_id = stream.GetStreamID();
+  stream_map_[stream_id] = std::move(stream);
+  return stream_id;
+}
+
+void Connection::SendStreamData(uint64_t stream_id, std::vector<uint8_t> & data, quic::Socket & sock, std::optional<uint64_t> largest_ack_received){
+  std::vector<uint8_t> client_app_hp = key_schedule_.GetClientAppHP();
+  std::vector<uint8_t> client_app_key = key_schedule_.GetClientAppKey();
+  std::vector<uint8_t> client_app_iv = key_schedule_.GetClientAppIV();
+
+  quic::StreamFrame & stream = stream_map_[stream_id];
+  stream.AddPayload(data);
+  stream.SetFin();
+  std::vector<uint8_t> stream_frame = stream.GetBinary();
+  quic::OneRttPacket one_rtt_packet(
+       id_of_server_, packet_number_manager_.GetPacketNumber(), largest_ack_received);
+  one_rtt_packet.AddFrame(stream_frame);
+  std::vector<uint8_t> send_binary = one_rtt_packet.GetBinary(
+    client_app_hp, client_app_key, client_app_iv);
+  sock.Send(send_binary);
+}
+
 
 } // namespace api
 } // namespace quic

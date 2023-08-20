@@ -12,6 +12,10 @@ void StreamFrame::AddPayload(std::string &in) {
   std::copy(in.begin(), in.end(), std::back_inserter(stream_data_));
 }
 
+void StreamFrame::AddPayload(std::vector<uint8_t> & in){
+  std::copy(in.begin(), in.end(), std::back_inserter(stream_data_));
+}
+
 void StreamFrame::SetStreamID(uint64_t stream_id) {
   stream_id_ = stream_id;
 }
@@ -90,5 +94,9 @@ void StreamFrame::Parse(std::vector<uint8_t> &buf, int &p) {
 }
 
 std::vector<uint8_t> StreamFrame::stream_data() { return stream_data_; }
+
+uint64_t StreamFrame::GetStreamID(){
+  return stream_id_;
+}
 
 } // namespace quic

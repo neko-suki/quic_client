@@ -4,9 +4,12 @@
 
 #include <stdint.h>
 
+#include "../../quic/stream_frame.hpp"
+#include "../../quic/stream_manager.hpp"
 #include "../../quic/initial_packet.hpp"
 #include "../../quic/initial_secret_generator.hpp"
 #include "../../quic/parse_common.hpp"
+#include "../../quic/packet_number_manager.hpp"
 #include "../../quic/socket.hpp"
 #include "../../tls/key_schedule.hpp"
 
@@ -47,6 +50,13 @@ public:
     return finished_hash_;
   }
 
+  uint64_t GetPacketNumber(){
+    return packet_number_manager_.GetPacketNumber();
+  }
+
+  uint64_t GetNextAvailableStreamID(bool is_unidirectional = false);
+  void SendStreamData(uint64_t stream_id, std::vector<uint8_t> & data, quic::Socket & sock, std::optional<uint64_t> largest_ack_received);
+
 private:
   void SendInitialPacket(quic::Socket & sock);
   void ReceiveInitialPacket(quic::Socket & sock, uint8_t packet[2048]);
@@ -57,6 +67,8 @@ private:
   InitialSecretGenerator initial_secret_generator_;
   std::vector<uint8_t> decoded_payload_;
   InitialPacket initial_packet_;
+
+  std::unordered_map<uint64_t, quic::StreamFrame> stream_map_;
 
   // return to main
   std::vector<uint8_t> id_of_client_;
@@ -70,7 +82,8 @@ private:
   std::vector<std::unique_ptr<quic::QUICFrame>> frame_in_handshake_packet_;
   std::unique_ptr<quic::CryptoFrame> crypto_frame_handshake_;
   std::vector<uint8_t> finished_hash_;
-
+  quic::StreamManager stream_manager_;
+  quic::PacketNumberManager packet_number_manager_;
 };
 
 } // api
